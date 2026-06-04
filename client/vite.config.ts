@@ -1,12 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/products': 'http://localhost:3000',
-      '/carts': 'http://localhost:3000',
+      "/products":
+        "https://shopping-cart-full-stack-production-0bda.up.railway.app",
+      "/carts":
+        "https://shopping-cart-full-stack-production-0bda.up.railway.app",
     },
   },
-})
+});
