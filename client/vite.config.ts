@@ -5,10 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/products":
-        "https://shopping-cart-full-stack-production-0bda.up.railway.app",
-      "/carts":
-        "https://shopping-cart-full-stack-production-0bda.up.railway.app",
+      "/products": "http://localhost:3000",
+      "/carts": "http://localhost:3000",
     },
   },
 });
