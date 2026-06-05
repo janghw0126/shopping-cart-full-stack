@@ -1,7 +1,6 @@
-import styled from "@emotion/styled";
 import type { CartItemType } from "../types/cart";
 import { useCartSelection } from "../hooks/useCartSelection";
-import { Header } from "../common/Header";
+import { PageLayout } from "../common/PageLayout";
 import { Button } from "../common/Button";
 import { CartHeader } from "./CartHeader";
 import { CartItems } from "./CartItems";
@@ -14,18 +13,6 @@ interface CartListProps {
   onDeleteItem: (productId: number) => void;
   onOrderCheck: (selectedCount: number, totalQuantity: number, totalAmount: number) => void;
 }
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-`;
-
-const Content = styled.main`
-  flex: 1;
-`;
-
-const Footer = styled.div``;
 
 export function CartList({
   cartItems,
@@ -44,28 +31,22 @@ export function CartList({
   }
 
   return (
-    <Wrapper>
-      <Header />
-      <Content>
-        <CartHeader itemCount={cartItems.length} />
-        <CartItems
-          cartItems={cartItems}
-          isSelected={isSelected}
-          allSelected={allSelected}
-          onToggleItem={toggleItem}
-          onToggleAll={toggleAll}
-          onUpdateQuantity={onUpdateQuantity}
-          onDeleteItem={onDeleteItem}
-        />
-        <OrderSummary
-          orderAmount={orderAmount}
-          shippingFee={shippingFee}
-          totalAmount={totalAmount}
-        />
-      </Content>
-      <Footer>
-        <Button label="주문 확인" onClick={handleOrderCheck} />
-      </Footer>
-    </Wrapper>
+    <PageLayout footer={<Button label="주문 확인" onClick={handleOrderCheck} />}>
+      <CartHeader itemCount={cartItems.length} />
+      <CartItems
+        cartItems={cartItems}
+        isSelected={isSelected}
+        allSelected={allSelected}
+        onToggleItem={toggleItem}
+        onToggleAll={toggleAll}
+        onUpdateQuantity={onUpdateQuantity}
+        onDeleteItem={onDeleteItem}
+      />
+      <OrderSummary
+        orderAmount={orderAmount}
+        shippingFee={shippingFee}
+        totalAmount={totalAmount}
+      />
+    </PageLayout>
   );
 }
