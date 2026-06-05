@@ -85,7 +85,7 @@ Please change the parent <Route path="${e}"> to <Route path="${e===`/`?`*`:`${e}
 `,wa=I.p`
   font-size: 12px;
   color: #0a0d13;
-`;function Ta({itemCount:e}){return(0,L.jsxs)(Sa,{children:[(0,L.jsx)(Ca,{children:`장바구니`}),(0,L.jsxs)(wa,{children:[`현재 `,e,`종류의 상품이 담겨있습니다.`]})]})}function Ea({checked:e,onChange:t}){return(0,L.jsx)(`img`,{src:e?`/check_filled.png`:`/check_empty.png`,alt:e?`선택됨`:`선택 안 됨`,style:{cursor:`pointer`,width:`24px`,height:`24px`},onClick:()=>t(!e)})}var Da=I.div`
+`;function Ta({itemCount:e}){return(0,L.jsxs)(Sa,{children:[(0,L.jsx)(Ca,{children:`장바구니`}),(0,L.jsxs)(wa,{children:[`현재 `,e,`종류의 상품이 담겨있습니다.`]})]})}function Ea({checked:e,onChange:t}){return(0,L.jsx)(`img`,{src:e?`/shopping-cart-full-stack/check_filled.png`:`/shopping-cart-full-stack/check_empty.png`,alt:e?`선택됨`:`선택 안 됨`,style:{cursor:`pointer`,width:`24px`,height:`24px`},onClick:()=>t(!e)})}var Da=I.div`
   padding: 16px 0;
   border-top: 1px solid #eee;
 `,Oa=I.div`
