@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetCartApi, UpdateQuantityApi } from "./api/cartApi";
+import { DeleteCartItemApi, GetCartApi, UpdateQuantityApi } from "./api/cartApi";
 import { Spinner } from "./common/Spinner";
 import type { CartItemType } from "./interface/cart";
 import { ErrorMessage } from "./common/ErrorMessage";
@@ -25,6 +25,13 @@ function App() {
     }
   }
 
+  async function deleteItem(productId: number) {
+    const success = await DeleteCartItemApi(productId);
+    if (success) {
+      setCartItems(cartItems.filter((item) => item.product.id !== productId));
+    }
+  }
+
   return loading ? (
     <Spinner />
   ) : error ? (
@@ -33,6 +40,7 @@ function App() {
     <CartList
       cartItems={cartItems}
       onUpdateQuantity={updateQuantity}
+      onDeleteItem={deleteItem}
     />
   ) : (
     <EmptyCart />

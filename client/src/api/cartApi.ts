@@ -23,6 +23,13 @@ export async function GetCartApi(
   }
 }
 
+export async function DeleteCartItemApi(productId: number): Promise<boolean> {
+  const res = await fetch(`/carts/${productId}`, { method: "DELETE" });
+  if (!res.ok) return false;
+  const { status } = await res.json();
+  return status === "success";
+}
+
 export async function UpdateQuantityApi(
   productId: number,
   quantity: number,
