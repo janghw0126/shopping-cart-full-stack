@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetCartApi } from "./api/cartApi";
+import { GetCartApi, UpdateQuantityApi } from "./api/cartApi";
 import { Spinner } from "./common/Spinner";
 import type { CartItemType } from "./interface/cart";
 import { ErrorMessage } from "./common/ErrorMessage";
@@ -16,12 +16,24 @@ function App() {
     GetCartApi(setLoading, setCartItems, setError);
   }, []);
 
+  async function updateQuantity(productId: number, quantity: number) {
+    const success = await UpdateQuantityApi(productId, quantity);
+    if (success) {
+      setCartItems(cartItems.map((item) =>
+        item.product.id === productId ? { ...item, quantity } : item
+      ));
+    }
+  }
+
   return loading ? (
     <Spinner />
   ) : error ? (
     <ErrorMessage message={error} />
   ) : cartItems.length !== 0 ? (
-    <CartList cartItems={cartItems} />
+    <CartList
+      cartItems={cartItems}
+      onUpdateQuantity={updateQuantity}
+    />
   ) : (
     <EmptyCart />
   );
