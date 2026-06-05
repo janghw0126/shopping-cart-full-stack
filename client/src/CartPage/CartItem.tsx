@@ -5,10 +5,17 @@ interface CartItemProps {
   isSelected: boolean;
   onToggle: () => void;
   onUpdateQuantity: (productId: number, quantity: number) => void;
+  onDeleteItem: (productId: number) => void;
 }
 
-export function CartItem({ item, isSelected, onToggle, onUpdateQuantity }: CartItemProps) {
+export function CartItem({ item, isSelected, onToggle, onUpdateQuantity, onDeleteItem }: CartItemProps) {
   const { product, quantity } = item;
+
+  function handleDelete() {
+    if (confirm(`'${product.name}'을(를) 삭제하시겠습니까?`)) {
+      onDeleteItem(product.id);
+    }
+  }
 
   function handleDecrease() {
     if (quantity <= 1) {
@@ -29,7 +36,7 @@ export function CartItem({ item, isSelected, onToggle, onUpdateQuantity }: CartI
   return (
     <div>
       <input type="checkbox" checked={isSelected} onChange={onToggle} />
-      <button>삭제</button>
+      <button onClick={handleDelete}>삭제</button>
       <img src={product.image} alt={product.name} />
       <div>
         <p>{product.name}</p>

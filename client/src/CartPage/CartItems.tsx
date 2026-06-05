@@ -8,9 +8,10 @@ interface CartItemsProps {
   onToggleItem: (id: number) => void;
   onToggleAll: (checked: boolean) => void;
   onUpdateQuantity: (productId: number, quantity: number) => void;
+  onDeleteItem: (productId: number) => void;
 }
 
-export function CartItems({ cartItems, isSelected, allSelected, onToggleItem, onToggleAll, onUpdateQuantity }: CartItemsProps) {
+export function CartItems({ cartItems, isSelected, allSelected, onToggleItem, onToggleAll, onUpdateQuantity, onDeleteItem }: CartItemsProps) {
 
   return (
     <div>
@@ -29,6 +30,7 @@ export function CartItems({ cartItems, isSelected, allSelected, onToggleItem, on
           isSelected={isSelected[item.product.id]}
           onToggle={() => onToggleItem(item.product.id)}
           onUpdateQuantity={onUpdateQuantity}
+          onDeleteItem={onDeleteItem}
         />
       ))}
     </div>
