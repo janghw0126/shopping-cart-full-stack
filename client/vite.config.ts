@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -10,5 +11,10 @@ export default defineConfig({
       "/carts":
         "https://shopping-cart-full-stack-production-0bda.up.railway.app",
     },
+  },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/test/setup.ts",
   },
 });
