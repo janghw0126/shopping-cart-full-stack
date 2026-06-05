@@ -2,6 +2,7 @@ import type { CartItemType } from "../interface/cart";
 import { useCartSelection } from "../hooks/useCartSelection";
 import { CartHeader } from "./CartHeader";
 import { CartItems } from "./CartItems";
+import { OrderSummary } from "./OrderSummary";
 
 interface CartListProps {
   cartItems: CartItemType[];
@@ -9,7 +10,11 @@ interface CartListProps {
   onDeleteItem: (productId: number) => void;
 }
 
-export function CartList({ cartItems, onUpdateQuantity, onDeleteItem }: CartListProps) {
+export function CartList({
+  cartItems,
+  onUpdateQuantity,
+  onDeleteItem,
+}: CartListProps) {
   const { isSelected, allSelected, toggleItem, toggleAll } =
     useCartSelection(cartItems);
 
@@ -25,6 +30,7 @@ export function CartList({ cartItems, onUpdateQuantity, onDeleteItem }: CartList
         onUpdateQuantity={onUpdateQuantity}
         onDeleteItem={onDeleteItem}
       />
+      <OrderSummary cartItems={cartItems} isSelected={isSelected} />
     </div>
   );
 }
