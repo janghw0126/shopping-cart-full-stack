@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { DeleteCartItemApi, GetCartApi, UpdateQuantityApi } from "./api/cartApi";
+import { useCart } from "./hooks/useCart";
 import { Spinner } from "./common/Spinner";
-import type { CartItemType } from "./interface/cart";
 import { ErrorMessage } from "./common/ErrorMessage";
 import { EmptyCart } from "./CartPage/EmptyCart";
 import { CartList } from "./CartPage/CartList";
@@ -10,29 +8,7 @@ import { OrderCheck } from "./OrderCheckPage/OrderCheck";
 
 function CartPage() {
   const navigate = useNavigate();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [cartItems, setCartItems] = useState<CartItemType[]>([]);
-
-  useEffect(() => {
-    GetCartApi(setLoading, setCartItems, setError);
-  }, []);
-
-  async function updateQuantity(productId: number, quantity: number) {
-    const success = await UpdateQuantityApi(productId, quantity);
-    if (success) {
-      setCartItems(cartItems.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
-      ));
-    }
-  }
-
-  async function deleteItem(productId: number) {
-    const success = await DeleteCartItemApi(productId);
-    if (success) {
-      setCartItems(cartItems.filter((item) => item.product.id !== productId));
-    }
-  }
+  const { loading, error, cartItems, updateQuantity, deleteItem } = useCart();
 
   function goToCheckout(selectedCount: number, totalQuantity: number, totalAmount: number) {
     navigate("/checkout", { state: { selectedCount, totalQuantity, totalAmount } });
