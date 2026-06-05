@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "@emotion/styled";
-import type { CartItemType } from "../interface/cart";
+import type { CartItemType } from "../types/cart";
 import { Checkbox } from "../common/Checkbox";
 
 interface CartItemProps {

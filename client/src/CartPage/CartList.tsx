@@ -1,12 +1,12 @@
 import styled from "@emotion/styled";
-import type { CartItemType } from "../interface/cart";
+import type { CartItemType } from "../types/cart";
 import { useCartSelection } from "../hooks/useCartSelection";
 import { Header } from "../common/Header";
 import { Button } from "../common/Button";
 import { CartHeader } from "./CartHeader";
 import { CartItems } from "./CartItems";
 import { OrderSummary } from "./OrderSummary";
-import { calcOrderSummary } from "./orderSummaryUtils";
+import { calcOrderSummary } from "../utils/orderSummaryUtils";
 
 interface CartListProps {
   cartItems: CartItemType[];

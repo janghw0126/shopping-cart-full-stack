@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import type { CartItemType } from "../interface/cart";
+import type { CartItemType } from "../types/cart";
 import { CartItem } from "./CartItem";
 import { Checkbox } from "../common/Checkbox";
 

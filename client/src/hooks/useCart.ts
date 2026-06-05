@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { DeleteCartItemApi, GetCartApi, UpdateQuantityApi } from "../api/cartApi";
-import type { CartItemType } from "../interface/cart";
+import type { CartItemType } from "../types/cart";
 
 export function useCart() {
   const [loading, setLoading] = useState(true);

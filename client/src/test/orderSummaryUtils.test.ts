@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { calcOrderSummary } from "../CartPage/orderSummaryUtils";
-import type { CartItemType } from "../interface/cart";
+import { calcOrderSummary } from "../utils/orderSummaryUtils";
+import type { CartItemType } from "../types/cart";
 
 const items: CartItemType[] = [
   { product: { id: 1, name: "A", price: 10000, image: "" }, quantity: 2 },

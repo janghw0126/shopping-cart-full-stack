@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CartItem } from "../CartPage/CartItem";
-import type { CartItemType } from "../interface/cart";
+import type { CartItemType } from "../types/cart";
 
 const mockItem: CartItemType = {
   product: {

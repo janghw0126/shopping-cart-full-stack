@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { CartItemType } from "../interface/cart";
+import type { CartItemType } from "../types/cart";
 
 const STORAGE_KEY = "cart-selected";
 

@@ -1,4 +1,4 @@
-import type { CartItemType } from "../interface/cart";
+import type { CartItemType } from "../types/cart";
 
 const SHIPPING_FEE = 3000;
 const FREE_SHIPPING_THRESHOLD = 100000;

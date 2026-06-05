@@ -1,4 +1,4 @@
-import type { CartItemType } from "../interface/cart";
+import type { CartItemType } from "../types/cart";
 
 export async function GetCartApi(
   setLoading: (value: boolean) => void,

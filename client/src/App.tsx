@@ -4,7 +4,7 @@ import { Spinner } from "./common/Spinner";
 import { ErrorMessage } from "./common/ErrorMessage";
 import { EmptyCart } from "./CartPage/EmptyCart";
 import { CartList } from "./CartPage/CartList";
-import { OrderCheck } from "./OrderCheckPage/OrderCheck";
+import { OrderCheck } from "./CheckoutPage/OrderCheck";
 
 function CartPage() {
   const navigate = useNavigate();
