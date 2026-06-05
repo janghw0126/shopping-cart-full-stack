@@ -4,10 +4,27 @@ interface CartItemProps {
   item: CartItemType;
   isSelected: boolean;
   onToggle: () => void;
+  onUpdateQuantity: (productId: number, quantity: number) => void;
 }
 
-export function CartItem({ item, isSelected, onToggle }: CartItemProps) {
+export function CartItem({ item, isSelected, onToggle, onUpdateQuantity }: CartItemProps) {
   const { product, quantity } = item;
+
+  function handleDecrease() {
+    if (quantity <= 1) {
+      alert("최소 1개까지 가능합니다.");
+      return;
+    }
+    onUpdateQuantity(product.id, quantity - 1);
+  }
+
+  function handleIncrease() {
+    if (quantity >= 99) {
+      alert("최대 99개까지 가능합니다.");
+      return;
+    }
+    onUpdateQuantity(product.id, quantity + 1);
+  }
 
   return (
     <div>
@@ -19,9 +36,9 @@ export function CartItem({ item, isSelected, onToggle }: CartItemProps) {
         <p>{product.price.toLocaleString()}원</p>
       </div>
       <div>
-        <button>-</button>
+        <button onClick={handleDecrease}>-</button>
         <span>{quantity}</span>
-        <button>+</button>
+        <button onClick={handleIncrease}>+</button>
       </div>
       <hr></hr>
     </div>
