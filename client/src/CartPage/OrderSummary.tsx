@@ -1,44 +1,87 @@
-import type { CartItemType } from "../interface/cart";
+import styled from "@emotion/styled";
 
 interface OrderSummaryProps {
-  cartItems: CartItemType[];
-  isSelected: { [id: number]: boolean };
-  onOrderCheck: (selectedCount: number, totalQuantity: number, totalAmount: number) => void;
+  orderAmount: number;
+  shippingFee: number;
+  totalAmount: number;
 }
 
-const SHIPPING_FEE = 3000;
-const FREE_SHIPPING_THRESHOLD = 100000;
+const Wrapper = styled.div`
+  padding: 24px;
+  margin-top: 8px;
+`;
 
-export function OrderSummary({ cartItems, isSelected, onOrderCheck }: OrderSummaryProps) {
-  const selectedItems = cartItems.filter((item) => isSelected[item.product.id]);
-  const orderAmount = selectedItems.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0
-  );
-  const shippingFee = orderAmount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
-  const totalAmount = orderAmount + shippingFee;
+const InfoText = styled.p`
+  font-family: Noto Sans;
+  font-color: #0a0d13;
+  font-weight: 500;
+  font-style: Display Medium;
+  font-size: 12px;
+  leading-trim: NONE;
+  line-height: 15px;
+  letter-spacing: 0%;
+  padding: 13px;
+`;
 
-  function handleOrderCheck() {
-    const totalQuantity = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
-    onOrderCheck(selectedItems.length, totalQuantity, totalAmount);
-  }
+const Divider = styled.div`
+  height: 1px;
+  background-color: #eee;
+`;
 
+const Row = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+`;
+
+const Label = styled.span`
+  font-family: Noto Sans;
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 16px;
+  leading-trim: NONE;
+  line-height: 16px;
+  letter-spacing: 0%;
+  vertical-align: middle;
+`;
+
+const Amount = styled.span`
+  font-family: Noto Sans KR;
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 24px;
+  leading-trim: NONE;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-align: right;
+  vertical-align: middle;
+`;
+
+export function OrderSummary({
+  orderAmount,
+  shippingFee,
+  totalAmount,
+}: OrderSummaryProps) {
   return (
-    <div>
-      <p>총 주문 금액이 100,000원 이상일 경우 무료 배송됩니다.</p>
-      <div>
-        <span>주문 금액</span>
-        <span>{orderAmount.toLocaleString()}원</span>
-      </div>
-      <div>
-        <span>배송비</span>
-        <span>{shippingFee.toLocaleString()}원</span>
-      </div>
-      <div>
-        <span>총 결제 금액</span>
-        <span>{totalAmount.toLocaleString()}원</span>
-      </div>
-      <button onClick={handleOrderCheck}>주문 확인</button>
-    </div>
+    <Wrapper>
+      <InfoText>
+        ⓘ 총 주문 금액이 100,000원 이상일 경우 무료 배송됩니다.
+      </InfoText>
+      <Divider />
+      <Row>
+        <Label>주문 금액</Label>
+        <Amount>{orderAmount.toLocaleString()}원</Amount>
+      </Row>
+      <Row>
+        <Label>배송비</Label>
+        <Amount>{shippingFee.toLocaleString()}원</Amount>
+      </Row>
+      <Divider />
+      <Row>
+        <Label>총 결제 금액</Label>
+        <Amount>{totalAmount.toLocaleString()}원</Amount>
+      </Row>
+    </Wrapper>
   );
 }
