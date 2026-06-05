@@ -1,11 +1,13 @@
 import type { CartItemType } from "../types/cart";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+
 export async function GetCartApi(
   setLoading: (value: boolean) => void,
   setCartItems: (value: CartItemType[]) => void,
   setError: (value: string) => void,
 ) {
-  const res = await fetch("/carts");
+  const res = await fetch(`${BASE_URL}/carts`);
   if (!res.ok) {
     setError(`HTTP error: ${res.status}`);
     setLoading(false);
@@ -24,7 +26,7 @@ export async function GetCartApi(
 }
 
 export async function DeleteCartItemApi(productId: number): Promise<boolean> {
-  const res = await fetch(`/carts/${productId}`, { method: "DELETE" });
+  const res = await fetch(`${BASE_URL}/carts/${productId}`, { method: "DELETE" });
   if (!res.ok) return false;
   const { status } = await res.json();
   return status === "success";
@@ -34,7 +36,7 @@ export async function UpdateQuantityApi(
   productId: number,
   quantity: number,
 ): Promise<boolean> {
-  const res = await fetch(`/carts/${productId}`, {
+  const res = await fetch(`${BASE_URL}/carts/${productId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ quantity }),
