@@ -5,9 +5,10 @@ import { CartItems } from "./CartItems";
 
 interface CartListProps {
   cartItems: CartItemType[];
+  onUpdateQuantity: (productId: number, quantity: number) => void;
 }
 
-export function CartList({ cartItems }: CartListProps) {
+export function CartList({ cartItems, onUpdateQuantity }: CartListProps) {
   const { isSelected, allSelected, toggleItem, toggleAll } =
     useCartSelection(cartItems);
 
@@ -20,6 +21,7 @@ export function CartList({ cartItems }: CartListProps) {
         allSelected={allSelected}
         onToggleItem={toggleItem}
         onToggleAll={toggleAll}
+        onUpdateQuantity={onUpdateQuantity}
       />
     </div>
   );
