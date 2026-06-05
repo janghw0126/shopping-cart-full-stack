@@ -1,12 +1,12 @@
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import { Header } from "../common/Header";
 import { Button } from "../common/Button";
 
-interface OrderCheckProps {
+interface LocationState {
   selectedCount: number;
   totalQuantity: number;
   totalAmount: number;
-  onBack: () => void;
 }
 
 const Wrapper = styled.div`
@@ -29,12 +29,8 @@ const Body = styled.div`
 const Title = styled.h2`
   font-family: Noto Sans KR;
   font-weight: 700;
-  font-style: Bold;
   font-size: 24px;
-  leading-trim: NONE;
   line-height: 100%;
-  letter-spacing: 0%;
-  vertical-align: middle;
   margin-bottom: 27px;
 `;
 
@@ -42,52 +38,38 @@ const Description = styled.p`
   color: #0a0d13;
   font-family: Noto Sans;
   font-weight: 500;
-  font-style: Display Medium;
   font-size: 12px;
-  leading-trim: NONE;
   line-height: 150%;
-  letter-spacing: 0%;
   text-align: center;
 `;
 
 const TotalLabel = styled.p`
   font-family: Noto Sans;
   font-weight: 700;
-  font-style: Bold;
   font-size: 16px;
-  leading-trim: NONE;
   line-height: 16px;
-  letter-spacing: 0%;
   text-align: center;
-  vertical-align: middle;
   margin-top: 24px;
 `;
 
 const TotalAmount = styled.p`
   font-family: Noto Sans KR;
   font-weight: 700;
-  font-style: Bold;
   font-size: 24px;
-  leading-trim: NONE;
   line-height: 100%;
-  letter-spacing: 0%;
   text-align: center;
-  vertical-align: middle;
-
-  font-weight: bold;
 `;
 
 const Footer = styled.div``;
 
-export function OrderCheck({
-  selectedCount,
-  totalQuantity,
-  totalAmount,
-  onBack,
-}: OrderCheckProps) {
+export function OrderCheck() {
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const { selectedCount, totalQuantity, totalAmount } = (state ?? {}) as LocationState;
+
   return (
     <Wrapper>
-      <Header onBack={onBack} />
+      <Header onBack={() => navigate("/cart")} />
       <Body>
         <Title>주문 확인</Title>
         <Description>
@@ -96,7 +78,7 @@ export function OrderCheck({
           최종 결제 금액을 확인해 주세요.
         </Description>
         <TotalLabel>총 결제 금액</TotalLabel>
-        <TotalAmount>{totalAmount.toLocaleString()}원</TotalAmount>
+        <TotalAmount>{totalAmount?.toLocaleString()}원</TotalAmount>
       </Body>
       <Footer>
         <Button label="결제하기" disabled />

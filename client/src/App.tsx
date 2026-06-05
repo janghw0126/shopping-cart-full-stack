@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { DeleteCartItemApi, GetCartApi, UpdateQuantityApi } from "./api/cartApi";
 import { Spinner } from "./common/Spinner";
 import type { CartItemType } from "./interface/cart";
@@ -7,17 +8,11 @@ import { EmptyCart } from "./CartPage/EmptyCart";
 import { CartList } from "./CartPage/CartList";
 import { OrderCheck } from "./OrderCheckPage/OrderCheck";
 
-interface OrderInfo {
-  selectedCount: number;
-  totalQuantity: number;
-  totalAmount: number;
-}
-
-function App() {
+function CartPage() {
+  const navigate = useNavigate();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
-  const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
 
   useEffect(() => {
     GetCartApi(setLoading, setCartItems, setError);
@@ -39,34 +34,31 @@ function App() {
     }
   }
 
-  function goToOrderCheck(selectedCount: number, totalQuantity: number, totalAmount: number) {
-    setOrderInfo({ selectedCount, totalQuantity, totalAmount });
+  function goToCheckout(selectedCount: number, totalQuantity: number, totalAmount: number) {
+    navigate("/checkout", { state: { selectedCount, totalQuantity, totalAmount } });
   }
 
-  if (orderInfo) {
-    return (
-      <OrderCheck
-        selectedCount={orderInfo.selectedCount}
-        totalQuantity={orderInfo.totalQuantity}
-        totalAmount={orderInfo.totalAmount}
-        onBack={() => setOrderInfo(null)}
-      />
-    );
-  }
+  if (loading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+  if (cartItems.length === 0) return <EmptyCart />;
 
-  return loading ? (
-    <Spinner />
-  ) : error ? (
-    <ErrorMessage message={error} />
-  ) : cartItems.length !== 0 ? (
+  return (
     <CartList
       cartItems={cartItems}
       onUpdateQuantity={updateQuantity}
       onDeleteItem={deleteItem}
-      onOrderCheck={goToOrderCheck}
+      onOrderCheck={goToCheckout}
     />
-  ) : (
-    <EmptyCart />
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/cart" element={<CartPage />} />
+      <Route path="/checkout" element={<OrderCheck />} />
+      <Route path="*" element={<Navigate to="/cart" replace />} />
+    </Routes>
   );
 }
 
