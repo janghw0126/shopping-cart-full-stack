@@ -8,12 +8,14 @@ interface CartListProps {
   cartItems: CartItemType[];
   onUpdateQuantity: (productId: number, quantity: number) => void;
   onDeleteItem: (productId: number) => void;
+  onOrderCheck: (selectedCount: number, totalQuantity: number, totalAmount: number) => void;
 }
 
 export function CartList({
   cartItems,
   onUpdateQuantity,
   onDeleteItem,
+  onOrderCheck,
 }: CartListProps) {
   const { isSelected, allSelected, toggleItem, toggleAll } =
     useCartSelection(cartItems);
@@ -30,7 +32,7 @@ export function CartList({
         onUpdateQuantity={onUpdateQuantity}
         onDeleteItem={onDeleteItem}
       />
-      <OrderSummary cartItems={cartItems} isSelected={isSelected} />
+      <OrderSummary cartItems={cartItems} isSelected={isSelected} onOrderCheck={onOrderCheck} />
     </div>
   );
 }

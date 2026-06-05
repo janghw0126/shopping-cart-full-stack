@@ -5,13 +5,20 @@ import type { CartItemType } from "./interface/cart";
 import { ErrorMessage } from "./common/ErrorMessage";
 import { EmptyCart } from "./CartPage/EmptyCart";
 import { CartList } from "./CartPage/CartList";
+import { OrderCheck } from "./OrderCheckPage/OrderCheck";
+
+interface OrderInfo {
+  selectedCount: number;
+  totalQuantity: number;
+  totalAmount: number;
+}
 
 function App() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
+  const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
 
-  // GET/carts 호출해서 장바구니 api 가져오기
   useEffect(() => {
     GetCartApi(setLoading, setCartItems, setError);
   }, []);
@@ -32,6 +39,21 @@ function App() {
     }
   }
 
+  function goToOrderCheck(selectedCount: number, totalQuantity: number, totalAmount: number) {
+    setOrderInfo({ selectedCount, totalQuantity, totalAmount });
+  }
+
+  if (orderInfo) {
+    return (
+      <OrderCheck
+        selectedCount={orderInfo.selectedCount}
+        totalQuantity={orderInfo.totalQuantity}
+        totalAmount={orderInfo.totalAmount}
+        onBack={() => setOrderInfo(null)}
+      />
+    );
+  }
+
   return loading ? (
     <Spinner />
   ) : error ? (
@@ -41,6 +63,7 @@ function App() {
       cartItems={cartItems}
       onUpdateQuantity={updateQuantity}
       onDeleteItem={deleteItem}
+      onOrderCheck={goToOrderCheck}
     />
   ) : (
     <EmptyCart />
