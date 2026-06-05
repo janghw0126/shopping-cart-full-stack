@@ -1,5 +1,7 @@
+import styled from "@emotion/styled";
 import type { CartItemType } from "../interface/cart";
 import { CartItem } from "./CartItem";
+import { Checkbox } from "../common/Checkbox";
 
 interface CartItemsProps {
   cartItems: CartItemType[];
@@ -11,18 +13,36 @@ interface CartItemsProps {
   onDeleteItem: (productId: number) => void;
 }
 
-export function CartItems({ cartItems, isSelected, allSelected, onToggleItem, onToggleAll, onUpdateQuantity, onDeleteItem }: CartItemsProps) {
+const Wrapper = styled.div`
+  padding: 0 24px;
+`;
 
+const SelectAllRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+`;
+
+const SelectAllLabel = styled.span`
+  font-size: 12px;
+`;
+
+export function CartItems({
+  cartItems,
+  isSelected,
+  allSelected,
+  onToggleItem,
+  onToggleAll,
+  onUpdateQuantity,
+  onDeleteItem,
+}: CartItemsProps) {
   return (
-    <div>
-      <div>
-        <input
-          type="checkbox"
-          checked={allSelected}
-          onChange={(e) => onToggleAll(e.target.checked)}
-        />
-        <span>전체선택</span>
-      </div>
+    <Wrapper>
+      <SelectAllRow>
+        <Checkbox checked={allSelected} onChange={onToggleAll} />
+        <SelectAllLabel>전체선택</SelectAllLabel>
+      </SelectAllRow>
       {cartItems.map((item) => (
         <CartItem
           key={item.product.id}
@@ -33,6 +53,6 @@ export function CartItems({ cartItems, isSelected, allSelected, onToggleItem, on
           onDeleteItem={onDeleteItem}
         />
       ))}
-    </div>
+    </Wrapper>
   );
 }
