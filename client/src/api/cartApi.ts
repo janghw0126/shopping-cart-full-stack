@@ -6,7 +6,11 @@ export async function GetCartApi(
   setError: (value: string) => void,
 ) {
   const res = await fetch("/carts");
-  if (!res.ok) return setError(`HTTP error: ${res.status}`);
+  if (!res.ok) {
+    setError(`HTTP error: ${res.status}`);
+    setLoading(false);
+    return;
+  }
   const response = await res.json();
   const { status, data } = response;
 
@@ -15,6 +19,7 @@ export async function GetCartApi(
     setLoading(false);
   } else {
     setError("장바구니 상품 목록을 성공적으로 불러오지 못했습니다.");
+    setLoading(false);
   }
 }
 
