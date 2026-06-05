@@ -17,3 +17,17 @@ export async function GetCartApi(
     setError("장바구니 상품 목록을 성공적으로 불러오지 못했습니다.");
   }
 }
+
+export async function UpdateQuantityApi(
+  productId: number,
+  quantity: number,
+): Promise<boolean> {
+  const res = await fetch(`/carts/${productId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ quantity }),
+  });
+  if (!res.ok) return false;
+  const { status } = await res.json();
+  return status === "success";
+}
