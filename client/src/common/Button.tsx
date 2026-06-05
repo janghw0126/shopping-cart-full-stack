@@ -1,4 +1,20 @@
-import "./Button.css";
+import styled from "@emotion/styled";
+
+const StyledButton = styled.button`
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  background-color: #333;
+  color: #fff;
+
+  &:disabled {
+    background-color: #bebebe;
+    cursor: not-allowed;
+  }
+`;
 
 interface ButtonProps {
   label: string;
@@ -8,8 +24,8 @@ interface ButtonProps {
 
 export function Button({ label, disabled = false, onClick }: ButtonProps) {
   return (
-    <button className="common-button" disabled={disabled} onClick={onClick}>
+    <StyledButton disabled={disabled} onClick={onClick}>
       {label}
-    </button>
+    </StyledButton>
   );
 }
