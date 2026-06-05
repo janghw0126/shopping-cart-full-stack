@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -13,7 +15,7 @@ body {
 
 #root {
   width: 430px;
-  height: 936px;
+  min-height: 100vh;
   opacity: 1;
   background-color: #fff;
   overflow-y: auto;
