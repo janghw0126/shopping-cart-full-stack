@@ -2,14 +2,16 @@ import type { CartItemType } from "../interface/cart";
 
 interface CartItemProps {
   item: CartItemType;
+  isSelected: boolean;
+  onToggle: () => void;
 }
 
-export function CartItem({ item }: CartItemProps) {
+export function CartItem({ item, isSelected, onToggle }: CartItemProps) {
   const { product, quantity } = item;
 
   return (
     <div>
-      <input type="checkbox" />
+      <input type="checkbox" checked={isSelected} onChange={onToggle} />
       <button>삭제</button>
       <img src={product.image} alt={product.name} />
       <div>
