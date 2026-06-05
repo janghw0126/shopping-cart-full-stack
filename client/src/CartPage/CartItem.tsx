@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styled from "@emotion/styled";
 import type { CartItemType } from "../interface/cart";
 import { Checkbox } from "../common/Checkbox";
@@ -43,6 +44,21 @@ const ProductImage = styled.img`
   height: 112px;
   border-radius: 8px;
   object-fit: cover;
+  flex-shrink: 0;
+`;
+
+const ImageFallback = styled.div`
+  width: 112px;
+  height: 112px;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+  flex-shrink: 0;
 `;
 
 const ProductInfo = styled.div`
@@ -96,6 +112,7 @@ export function CartItem({
   onDeleteItem,
 }: CartItemProps) {
   const { product, quantity } = item;
+  const [imgError, setImgError] = useState(false);
 
   function handleDelete() {
     if (confirm(`'${product.name}'을(를) 삭제하시겠습니까?`)) {
@@ -126,7 +143,15 @@ export function CartItem({
         <DeleteButton onClick={handleDelete}>삭제</DeleteButton>
       </TopRow>
       <ProductRow>
-        <ProductImage src={product.image} alt={product.name} />
+        {imgError ? (
+          <ImageFallback>이미지를<br />불러올 수<br />없습니다</ImageFallback>
+        ) : (
+          <ProductImage
+            src={product.image}
+            alt={product.name}
+            onError={() => setImgError(true)}
+          />
+        )}
         <ProductInfo>
           <ProductName>{product.name}</ProductName>
           <ProductPrice>{product.price.toLocaleString()}원</ProductPrice>
