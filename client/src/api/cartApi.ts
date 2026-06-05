@@ -1,8 +1,8 @@
-import type { CartItem } from "../interface/cart";
+import type { CartItemType } from "../interface/cart";
 
 export async function GetCartApi(
   setLoading: (value: boolean) => void,
-  setCartItems: (value: CartItem[]) => void,
+  setCartItems: (value: CartItemType[]) => void,
   setError: (value: string) => void,
 ) {
   const res = await fetch("/carts");
