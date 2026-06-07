@@ -9,7 +9,7 @@ export async function getCartApi(
 ) {
   const res = await fetch(`${BASE_URL}/carts`);
   if (!res.ok) {
-    setError(`HTTP error: ${res.status}`);
+    setError("장바구니를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
     setLoading(false);
     return;
   }
