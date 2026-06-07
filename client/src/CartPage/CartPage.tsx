@@ -9,6 +9,7 @@ import {
   getCartApi,
   updateQuantityApi,
 } from "../api/cartApi";
+import type { OrderCheckInfo } from "../types/cart";
 
 export function CartPage() {
   const navigate = useNavigate();
@@ -18,11 +19,11 @@ export function CartPage() {
     deleteCart: deleteCartItemApi,
   });
 
-  function goToCheckout(
-    selectedCount: number,
-    totalQuantity: number,
-    totalAmount: number,
-  ) {
+  function goToCheckout({
+    selectedCount,
+    totalQuantity,
+    totalAmount,
+  }: OrderCheckInfo) {
     navigate("/checkout", {
       state: { selectedCount, totalQuantity, totalAmount },
     });

@@ -1,4 +1,4 @@
-import type { CartItemType } from "../types/cart";
+import type { CartItemType, OrderCheckInfo } from "../types/cart";
 import { useCartSelection } from "../hooks/useCartSelection";
 import { PageLayout } from "../common/PageLayout";
 import { Button } from "../common/Button";
@@ -11,11 +11,7 @@ interface CartListProps {
   cartItems: CartItemType[];
   onUpdateQuantity: (productId: number, quantity: number) => void;
   onDeleteItem: (productId: number) => void;
-  onOrderCheck: (
-    selectedCount: number,
-    totalQuantity: number,
-    totalAmount: number,
-  ) => void;
+  onOrderCheck: (info: OrderCheckInfo) => void;
 }
 
 export function CartList({
@@ -36,7 +32,7 @@ export function CartList({
   } = calcOrderSummary(cartItems, isSelected);
 
   function handleOrderCheck() {
-    onOrderCheck(selectedCount, totalQuantity, totalAmount);
+    onOrderCheck({ selectedCount, totalQuantity, totalAmount });
   }
 
   return (
