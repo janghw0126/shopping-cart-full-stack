@@ -5,7 +5,7 @@ import { Checkbox } from "../common/Checkbox";
 
 interface CartItemsProps {
   cartItems: CartItemType[];
-  isSelected: Record<number, boolean>;
+  isSelected: { [id: number]: boolean };
   allSelected: boolean;
   onToggleItem: (id: number) => void;
   onToggleAll: (checked: boolean) => void;
