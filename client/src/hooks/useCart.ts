@@ -18,7 +18,7 @@ export function useCart({ fetchCart, updateCart, deleteCart }: CartApi) {
         const data = await fetchCart();
         setCartItems(data);
       } catch {
-        setError("장바구니를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.");
+        setError("장바구니를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
       } finally {
         setLoading(false);
       }
@@ -26,21 +26,31 @@ export function useCart({ fetchCart, updateCart, deleteCart }: CartApi) {
   }, []);
 
   async function updateQuantity(productId: number, quantity: number) {
-    const success = await updateCart(productId, quantity);
-    if (success) {
+    try {
+      const success = await updateCart(productId, quantity);
+      if (!success) throw new Error();
       setCartItems((prev) =>
         prev.map((item) =>
-          item.product.id === productId ? { ...item, quantity } : item
-        )
+          item.product.id === productId ? { ...item, quantity } : item,
+        ),
+      );
+    } catch {
+      setError(
+        "장바구니 상품 수량 업데이트에 실패하였습니다. 다시 시도해주세요.",
       );
     }
   }
 
   async function deleteItem(productId: number) {
-    const success = await deleteCart(productId);
-    if (success) {
+    try {
+      const success = await deleteCart(productId);
+      if (!success) throw new Error();
       setCartItems((prev) =>
-        prev.filter((item) => item.product.id !== productId)
+        prev.filter((item) => item.product.id !== productId),
+      );
+    } catch {
+      setError(
+        "장바구니 상품 삭제 업데이트에 실패하였습니다. 다시 시도해주세요.",
       );
     }
   }
