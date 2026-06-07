@@ -2,27 +2,14 @@ import type { CartItemType } from "../types/cart";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
-export async function getCartApi(
-  setLoading: (value: boolean) => void,
-  setCartItems: (value: CartItemType[]) => void,
-  setError: (value: string) => void,
-) {
+export async function getCartApi(): Promise<CartItemType[]> {
   const res = await fetch(`${BASE_URL}/carts`);
-  if (!res.ok) {
-    setError("장바구니를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
-    setLoading(false);
-    return;
-  }
-  const response = await res.json();
-  const { status, data } = response;
-
-  if (status === "success") {
-    setCartItems(data);
-    setLoading(false);
-  } else {
-    setError("장바구니 상품 목록을 성공적으로 불러오지 못했습니다.");
-    setLoading(false);
-  }
+  if (!res.ok)
+    throw new Error("장바구니를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
+  const { status, data } = await res.json();
+  if (status !== "success")
+    throw new Error("장바구니를 불러오는 데 실패했습니다.");
+  return data;
 }
 
 export async function deleteCartItemApi(productId: number): Promise<boolean> {
