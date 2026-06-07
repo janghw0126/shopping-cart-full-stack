@@ -15,11 +15,8 @@ const InfoText = styled.p`
   font-family: Noto Sans;
   font-color: #0a0d13;
   font-weight: 500;
-  font-style: Display Medium;
   font-size: 12px;
-  leading-trim: NONE;
   line-height: 15px;
-  letter-spacing: 0%;
   padding: 13px;
 `;
 
@@ -38,22 +35,16 @@ const Row = styled.div`
 const Label = styled.span`
   font-family: Noto Sans;
   font-weight: 700;
-  font-style: Bold;
   font-size: 16px;
-  leading-trim: NONE;
   line-height: 16px;
-  letter-spacing: 0%;
   vertical-align: middle;
 `;
 
 const Amount = styled.span`
   font-family: Noto Sans KR;
   font-weight: 700;
-  font-style: Bold;
   font-size: 24px;
-  leading-trim: NONE;
   line-height: 100%;
-  letter-spacing: 0%;
   text-align: right;
   vertical-align: middle;
 `;
