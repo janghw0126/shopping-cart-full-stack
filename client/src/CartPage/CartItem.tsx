@@ -2,6 +2,7 @@ import { useState } from "react";
 import styled from "@emotion/styled";
 import type { CartItemType } from "../types/cart";
 import { Checkbox } from "../common/Checkbox";
+import { canDecrease, canIncrease, CART_QUANTITY } from "../domain/cart";
 
 interface CartItemProps {
   item: CartItemType;
@@ -121,16 +122,16 @@ export function CartItem({
   }
 
   function handleDecrease() {
-    if (quantity <= 1) {
-      alert("최소 1개까지 가능합니다.");
+    if (!canDecrease(quantity)) {
+      alert(`최소 ${CART_QUANTITY.MIN}개까지 가능합니다.`);
       return;
     }
     onUpdateQuantity(product.id, quantity - 1);
   }
 
   function handleIncrease() {
-    if (quantity >= 99) {
-      alert("최대 99개까지 가능합니다.");
+    if (!canIncrease(quantity)) {
+      alert(`최대 ${CART_QUANTITY.MAX}개까지 가능합니다.`);
       return;
     }
     onUpdateQuantity(product.id, quantity + 1);
@@ -144,7 +145,12 @@ export function CartItem({
       </TopRow>
       <ProductRow>
         {imgError ? (
-          <ImageFallback>이미지를<br />불러올 수<br />없습니다</ImageFallback>
+          <ImageFallback>
+            이미지를
+            <br />
+            불러올 수<br />
+            없습니다
+          </ImageFallback>
         ) : (
           <ProductImage
             src={product.image}
