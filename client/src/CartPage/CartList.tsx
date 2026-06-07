@@ -11,7 +11,11 @@ interface CartListProps {
   cartItems: CartItemType[];
   onUpdateQuantity: (productId: number, quantity: number) => void;
   onDeleteItem: (productId: number) => void;
-  onOrderCheck: (selectedCount: number, totalQuantity: number, totalAmount: number) => void;
+  onOrderCheck: (
+    selectedCount: number,
+    totalQuantity: number,
+    totalAmount: number,
+  ) => void;
 }
 
 export function CartList({
@@ -23,15 +27,22 @@ export function CartList({
   const { isSelected, allSelected, toggleItem, toggleAll } =
     useCartSelection(cartItems);
 
-  const { selectedCount, totalQuantity, orderAmount, shippingFee, totalAmount } =
-    calcOrderSummary(cartItems, isSelected);
+  const {
+    selectedCount,
+    totalQuantity,
+    orderAmount,
+    shippingFee,
+    totalAmount,
+  } = calcOrderSummary(cartItems, isSelected);
 
   function handleOrderCheck() {
     onOrderCheck(selectedCount, totalQuantity, totalAmount);
   }
 
   return (
-    <PageLayout footer={<Button label="주문 확인" onClick={handleOrderCheck} />}>
+    <PageLayout
+      footer={<Button label="주문 확인" onClick={handleOrderCheck} />}
+    >
       <CartHeader itemCount={cartItems.length} />
       <CartItems
         cartItems={cartItems}
