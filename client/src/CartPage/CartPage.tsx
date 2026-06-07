@@ -1,21 +1,21 @@
 import { useNavigate } from "react-router-dom";
-import {
-  DeleteCartItemApi,
-  GetCartApi,
-  UpdateQuantityApi,
-} from "../api/cartApi";
 import { Spinner } from "../common/Spinner";
 import { ErrorMessage } from "../common/ErrorMessage";
 import { EmptyCart } from "./EmptyCart";
 import { CartList } from "./CartList";
 import { useCart } from "../hooks/useCart";
+import {
+  deleteCartItemApi,
+  getCartApi,
+  updateQuantityApi,
+} from "../api/cartApi";
 
 export function CartPage() {
   const navigate = useNavigate();
   const { loading, error, cartItems, updateQuantity, deleteItem } = useCart({
-    fetchCart: GetCartApi,
-    updateCart: UpdateQuantityApi,
-    deleteCart: DeleteCartItemApi,
+    fetchCart: getCartApi,
+    updateCart: updateQuantityApi,
+    deleteCart: deleteCartItemApi,
   });
 
   function goToCheckout(

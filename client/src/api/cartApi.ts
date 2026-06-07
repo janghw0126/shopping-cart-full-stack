@@ -2,7 +2,7 @@ import type { CartItemType } from "../types/cart";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
-export async function GetCartApi(
+export async function getCartApi(
   setLoading: (value: boolean) => void,
   setCartItems: (value: CartItemType[]) => void,
   setError: (value: string) => void,
@@ -25,14 +25,16 @@ export async function GetCartApi(
   }
 }
 
-export async function DeleteCartItemApi(productId: number): Promise<boolean> {
-  const res = await fetch(`${BASE_URL}/carts/${productId}`, { method: "DELETE" });
+export async function deleteCartItemApi(productId: number): Promise<boolean> {
+  const res = await fetch(`${BASE_URL}/carts/${productId}`, {
+    method: "DELETE",
+  });
   if (!res.ok) return false;
   const { status } = await res.json();
   return status === "success";
 }
 
-export async function UpdateQuantityApi(
+export async function updateQuantityApi(
   productId: number,
   quantity: number,
 ): Promise<boolean> {
