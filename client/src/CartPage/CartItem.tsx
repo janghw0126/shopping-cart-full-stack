@@ -2,7 +2,6 @@ import { useState } from "react";
 import styled from "@emotion/styled";
 import type { CartItemType } from "../types/cart";
 import { Checkbox } from "../common/Checkbox";
-import { canDecrease, canIncrease, CART_QUANTITY } from "../domain/cart";
 
 interface CartItemProps {
   item: CartItemType;
@@ -116,24 +115,14 @@ export function CartItem({
   const [imgError, setImgError] = useState(false);
 
   function handleDelete() {
-    if (confirm(`'${product.name}'을(를) 삭제하시겠습니까?`)) {
-      onDeleteItem(product.id);
-    }
+    onDeleteItem(product.id);
   }
 
   function handleDecrease() {
-    if (!canDecrease(quantity)) {
-      alert(`최소 ${CART_QUANTITY.MIN}개까지 가능합니다.`);
-      return;
-    }
     onUpdateQuantity(product.id, quantity - 1);
   }
 
   function handleIncrease() {
-    if (!canIncrease(quantity)) {
-      alert(`최대 ${CART_QUANTITY.MAX}개까지 가능합니다.`);
-      return;
-    }
     onUpdateQuantity(product.id, quantity + 1);
   }
 
