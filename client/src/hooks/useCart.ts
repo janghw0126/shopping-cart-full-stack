@@ -26,27 +26,29 @@ export function useCart({ fetchCart, updateCart, deleteCart }: CartApi) {
   }, []);
 
   async function updateQuantity(productId: number, quantity: number) {
+    const prevItems = cartItems;
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.product.id === productId ? { ...item, quantity } : item,
+      ),
+    );
     try {
       const success = await updateCart(productId, quantity);
       if (!success) throw new Error();
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.product.id === productId ? { ...item, quantity } : item,
-        ),
-      );
     } catch {
+      setCartItems(prevItems);
       alert("장바구니 상품 수량 업데이트에 실패하였습니다. 다시 시도해주세요.");
     }
   }
 
   async function deleteItem(productId: number) {
+    const prevItems = cartItems;
+    setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
     try {
       const success = await deleteCart(productId);
       if (!success) throw new Error();
-      setCartItems((prev) =>
-        prev.filter((item) => item.product.id !== productId),
-      );
     } catch {
+      setCartItems(prevItems);
       alert("장바구니 상품 삭제에 실패하였습니다. 다시 시도해주세요.");
     }
   }
