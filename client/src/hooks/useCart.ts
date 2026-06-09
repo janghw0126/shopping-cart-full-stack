@@ -35,9 +35,7 @@ export function useCart({ fetchCart, updateCart, deleteCart }: CartApi) {
         ),
       );
     } catch {
-      setError(
-        "장바구니 상품 수량 업데이트에 실패하였습니다. 다시 시도해주세요.",
-      );
+      alert("장바구니 상품 수량 업데이트에 실패하였습니다. 다시 시도해주세요.");
     }
   }
 
@@ -49,9 +47,7 @@ export function useCart({ fetchCart, updateCart, deleteCart }: CartApi) {
         prev.filter((item) => item.product.id !== productId),
       );
     } catch {
-      setError(
-        "장바구니 상품 삭제 업데이트에 실패하였습니다. 다시 시도해주세요.",
-      );
+      alert("장바구니 상품 삭제에 실패하였습니다. 다시 시도해주세요.");
     }
   }
 
