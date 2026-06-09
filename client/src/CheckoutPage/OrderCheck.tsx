@@ -1,13 +1,13 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import { Header } from "../common/Header";
 import { Button } from "../common/Button";
-
-interface LocationState {
-  selectedCount: number;
-  totalQuantity: number;
-  totalAmount: number;
-}
+import { Spinner } from "../common/Spinner";
+import { calcOrderSummary } from "../utils/orderSummaryUtils";
+import { getCartApi } from "../api/cartApi";
+import { STORAGE_KEY } from "../hooks/useCartSelection";
+import { useEffect, useState } from "react";
+import type { CartItemType } from "../types/cart";
 
 const Wrapper = styled.div`
   display: flex;
@@ -64,8 +64,26 @@ const Footer = styled.div``;
 
 export function OrderCheck() {
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const { selectedCount, totalQuantity, totalAmount } = (state ?? {}) as LocationState;
+
+  const [loading, setLoading] = useState(true);
+  const [cartItems, setCartItems] = useState<CartItemType[]>([]);
+
+  useEffect(() => {
+    getCartApi()
+      .then(setCartItems)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const result = localStorage.getItem(STORAGE_KEY);
+  const isSelected: { [id: number]: boolean } =
+    result !== null ? JSON.parse(result) : {};
+
+  if (loading) return <Spinner />;
+
+  const { selectedCount, totalQuantity, totalAmount } = calcOrderSummary(
+    cartItems,
+    isSelected,
+  );
 
   return (
     <Wrapper>
@@ -78,7 +96,7 @@ export function OrderCheck() {
           최종 결제 금액을 확인해 주세요.
         </Description>
         <TotalLabel>총 결제 금액</TotalLabel>
-        <TotalAmount>{totalAmount?.toLocaleString()}원</TotalAmount>
+        <TotalAmount>{totalAmount.toLocaleString()}원</TotalAmount>
       </Body>
       <Footer>
         <Button label="결제하기" disabled />

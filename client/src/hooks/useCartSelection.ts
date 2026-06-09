@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CartItemType } from "../types/cart";
 
-const STORAGE_KEY = "cart-selected";
+export const STORAGE_KEY = "cart-selected";
 
 export function useCartSelection(cartItems: CartItemType[]) {
   const [isSelected, setIsSelected] = useState<{ [id: number]: boolean }>(
@@ -14,7 +14,10 @@ export function useCartSelection(cartItems: CartItemType[]) {
   const activeSelection = useMemo(
     () =>
       Object.fromEntries(
-        cartItems.map((item) => [item.product.id, isSelected[item.product.id] ?? true]),
+        cartItems.map((item) => [
+          item.product.id,
+          isSelected[item.product.id] ?? true,
+        ]),
       ),
     [cartItems, isSelected],
   );
