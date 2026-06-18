@@ -62,8 +62,14 @@ describe("selectTopTwoCoupons", () => {
       const coupons = [FREESHIPPING, MIRACLESALE];
 
       expect(
-        selectTopTwoCoupons(coupons, cartItems, 50_000, DELIVERY_FEE),
-      ).toEqual(coupons);
+        selectTopTwoCoupons(
+          coupons,
+          cartItems,
+          50_000,
+          DELIVERY_FEE,
+          new Date("2026-07-01T12:00:00"), // MIRACLESALE 비적용 시간 → FREESHIPPING이 1위
+        ),
+      ).toEqual([FREESHIPPING, MIRACLESALE]);
     });
   });
 
