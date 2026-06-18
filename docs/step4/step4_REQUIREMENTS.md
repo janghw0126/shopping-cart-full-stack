@@ -2,6 +2,8 @@
 
 ## DB 설계
 
+![alt text](image.png)
+
 ## BE 구현 목록
 
 ### 1. 주문 생성
