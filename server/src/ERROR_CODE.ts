@@ -54,6 +54,16 @@ const ERROR_CODES = {
     message: "장바구니에 존재하지 않는 상품입니다.",
     status: 404,
   },
+  INVALID_ORDER: {
+    code: "INVALID_ORDER",
+    message: "유효하지 않은 주문 요청입니다.",
+    status: 400,
+  },
+  OUT_OF_STOCK: {
+    code: "OUT_OF_STOCK",
+    message: "재고가 없는 상품입니다.",
+    status: 404,
+  },
 } as const;
 
 export default ERROR_CODES;
