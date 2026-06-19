@@ -79,6 +79,17 @@ const calculateCombinedDiscount = (
   return fixedDiscount + percentageDiscount + shippingDiscount;
 };
 
+export const calculateFinalAmount = (
+  coupons: Coupon[],
+  cartItems: CartItem[],
+  orderTotal: number,
+  deliveryFee: number,
+  now: Date = new Date(),
+): number => {
+  const totalDiscount = calculateCombinedDiscount(coupons, cartItems, orderTotal, deliveryFee, now);
+  return Math.max(0, orderTotal + deliveryFee - totalDiscount);
+};
+
 export const findBogoGiftProductId = (cartItems: CartItem[]): number | null => {
   const eligible = cartItems.filter((item) => item.quantity >= 2);
   if (eligible.length === 0) return null;
