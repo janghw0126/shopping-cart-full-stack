@@ -2,7 +2,7 @@ jest.mock("./orders.repository");
 
 import { AppError } from "@/errors/AppError";
 import * as repo from "./orders.repository";
-import { getOrder } from "./orders.service";
+import { getCoupons, getOrder } from "./orders.service";
 
 const mockGetOrderById = repo.getOrderByIdQuery as jest.MockedFunction<
   typeof repo.getOrderByIdQuery
@@ -15,6 +15,9 @@ const mockGetOrderCoupons =
   repo.getOrderCouponsByOrderIdQuery as jest.MockedFunction<
     typeof repo.getOrderCouponsByOrderIdQuery
   >;
+const mockGetAllCoupons = repo.getAllCouponsQuery as jest.MockedFunction<
+  typeof repo.getAllCouponsQuery
+>;
 
 const mockOrder = { id: 1, isExpired: false, isRemoteArea: false, deliveryFee: 3000 };
 const mockProducts = [
@@ -31,6 +34,68 @@ const mockCoupons = [
     expirationDate: "2025-12-31",
   },
 ];
+
+const allCoupons = [
+  {
+    id: 1,
+    code: "FIXED5000",
+    title: "5000원 할인",
+    discountType: "fixed" as const,
+    discountValue: 5000,
+    minimumAmount: 50000,
+    expirationDate: "2099-12-31",
+  },
+  {
+    id: 2,
+    code: "EXPIRED",
+    title: "만료 쿠폰",
+    discountType: "fixed" as const,
+    discountValue: 1000,
+    expirationDate: "2020-01-01",
+  },
+];
+
+describe("getCoupons", () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it("존재하지 않는 주문이면 NOT_FOUND_ORDER 에러를 던진다", async () => {
+    mockGetOrderById.mockResolvedValue(null);
+
+    await expect(getCoupons(999)).rejects.toMatchObject({ code: "NOT_FOUND_ORDER" });
+  });
+
+  it("각 쿠폰에 isCouponUsable 필드가 포함된다", async () => {
+    mockGetOrderById.mockResolvedValue(mockOrder);
+    mockGetAllCoupons.mockResolvedValue(allCoupons);
+    mockGetOrderProducts.mockResolvedValue(mockProducts); // 4500 * 2 = 9000
+
+    const result = await getCoupons(1);
+
+    expect(result[0]).toHaveProperty("isCouponUsable");
+  });
+
+  it("최소 주문 금액 미달 쿠폰은 isCouponUsable이 false이다", async () => {
+    mockGetOrderById.mockResolvedValue(mockOrder);
+    mockGetAllCoupons.mockResolvedValue(allCoupons);
+    mockGetOrderProducts.mockResolvedValue(mockProducts); // 합계 9000 < 최소 50000
+
+    const result = await getCoupons(1);
+    const fixed = result.find((c) => c.code === "FIXED5000");
+
+    expect(fixed?.isCouponUsable).toBe(false);
+  });
+
+  it("만료된 쿠폰은 isCouponUsable이 false이다", async () => {
+    mockGetOrderById.mockResolvedValue(mockOrder);
+    mockGetAllCoupons.mockResolvedValue(allCoupons);
+    mockGetOrderProducts.mockResolvedValue(mockProducts);
+
+    const result = await getCoupons(1);
+    const expired = result.find((c) => c.code === "EXPIRED");
+
+    expect(expired?.isCouponUsable).toBe(false);
+  });
+});
 
 describe("getOrder", () => {
   beforeEach(() => jest.clearAllMocks());
