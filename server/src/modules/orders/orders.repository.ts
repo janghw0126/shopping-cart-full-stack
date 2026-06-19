@@ -233,3 +233,14 @@ export const updateOrderProductGiftsQuery = async (
       .eq("product_id", giftProductId);
   }
 };
+
+export const removeExpiredCouponsFromOrderQuery = async (
+  orderId: number,
+  expiredCouponIds: number[],
+): Promise<void> => {
+  await supabase
+    .from("order_coupons")
+    .delete()
+    .eq("order_id", orderId)
+    .in("coupon_id", expiredCouponIds);
+};
