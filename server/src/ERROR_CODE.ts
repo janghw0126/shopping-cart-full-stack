@@ -79,6 +79,16 @@ const ERROR_CODES = {
     message: "유효하지 않은 주문 변경 요청입니다.",
     status: 400,
   },
+  INVALID_PAYMENT: {
+    code: "INVALID_PAYMENT",
+    message: "유효하지 않은 결제 요청입니다.",
+    status: 400,
+  },
+  PAYMENT_AMOUNT_MISMATCH: {
+    code: "PAYMENT_AMOUNT_MISMATCH",
+    message: "결제 금액이 일치하지 않습니다.",
+    status: 400,
+  },
 } as const;
 
 export default ERROR_CODES;
