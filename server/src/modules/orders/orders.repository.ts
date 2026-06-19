@@ -13,19 +13,29 @@ export type OrderProductRow = Product & { quantity: number };
 
 type ProductWithStock = Product & { stock: number };
 
+const DB_DISCOUNT_TYPE_MAP: Record<string, Coupon["discountType"]> = {
+  FIXED: "fixed",
+  BOGO: "buyXgetY",
+  FREESHIPPING: "freeShipping",
+  MIRACLESALE: "percentage",
+};
+
+const toTimeString = (hour: number) =>
+  `${String(hour).padStart(2, "0")}:00`;
+
 const mapToCoupon = (row: Record<string, unknown>): Coupon => ({
   id: row.id as number,
-  code: row.code as string,
+  code: (row.code as string) ?? "",
   title: row.title as string,
-  discountType: row.discount_type as Coupon["discountType"],
-  discountValue: row.discount_value as number,
-  minimumAmount: (row.minimum_amount as number) ?? undefined,
+  discountType: DB_DISCOUNT_TYPE_MAP[row.discount_type as string],
+  discountValue: (row.discount_value as number) ?? 0,
+  minimumAmount: (row.min_order_amount as number) ?? undefined,
   expirationDate: row.expiration_date as string,
   availableTime:
-    row.available_time_start
+    row.available_hours_start != null
       ? {
-          start: row.available_time_start as string,
-          end: row.available_time_end as string,
+          start: toTimeString(row.available_hours_start as number),
+          end: toTimeString(row.available_hours_end as number),
         }
       : undefined,
 });
