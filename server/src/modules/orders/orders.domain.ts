@@ -79,6 +79,22 @@ const calculateCombinedDiscount = (
   return fixedDiscount + percentageDiscount + shippingDiscount;
 };
 
+export const isCouponUsable = (
+  coupon: Coupon,
+  orderTotal: number,
+  now: Date = new Date(),
+): boolean => {
+  const expirationDay = new Date(coupon.expirationDate);
+  expirationDay.setHours(23, 59, 59, 999);
+  if (expirationDay < now) return false;
+
+  if (coupon.minimumAmount && orderTotal < coupon.minimumAmount) return false;
+
+  if (!isWithinAvailableTime(coupon, now)) return false;
+
+  return true;
+};
+
 export const selectTopTwoCoupons = (
   coupons: Coupon[],
   cartItems: CartItem[],

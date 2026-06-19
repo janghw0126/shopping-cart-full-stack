@@ -1,6 +1,6 @@
 import { AppError } from "@/errors/AppError";
 import type { CartItem } from "@/type";
-import { selectTopTwoCoupons } from "./orders.domain";
+import { isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
 import type { OrderProduct } from "./orders.schema";
 import {
   createOrderCouponsQuery,
@@ -71,6 +71,27 @@ export const createOrder = async (orderProducts: OrderProduct[]) => {
   }
 
   return { orderId: order.id };
+};
+
+export const getCoupons = async (orderId: number) => {
+  const order = await getOrderByIdQuery(orderId);
+  if (!order) throw new AppError("NOT_FOUND_ORDER");
+
+  const [coupons, orderProducts] = await Promise.all([
+    getAllCouponsQuery(),
+    getOrderProductsByOrderIdQuery(orderId),
+  ]);
+
+  const orderTotal = orderProducts.reduce(
+    (sum, p) => sum + p.price * p.quantity,
+    0,
+  );
+  const now = new Date();
+
+  return coupons.map((coupon) => ({
+    ...coupon,
+    isCouponUsable: isCouponUsable(coupon, orderTotal, now),
+  }));
 };
 
 export const getOrder = async (orderId: number) => {
