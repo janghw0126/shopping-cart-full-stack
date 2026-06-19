@@ -81,6 +81,7 @@ const calculateCombinedDiscount = (
 
 export const isCouponUsable = (
   coupon: Coupon,
+  cartItems: CartItem[],
   orderTotal: number,
   now: Date = new Date(),
 ): boolean => {
@@ -91,6 +92,11 @@ export const isCouponUsable = (
   if (coupon.minimumAmount && orderTotal < coupon.minimumAmount) return false;
 
   if (!isWithinAvailableTime(coupon, now)) return false;
+
+  if (coupon.discountType === "buyXgetY") {
+    const hasEligibleItem = cartItems.some((item) => item.quantity >= 2);
+    if (!hasEligibleItem) return false;
+  }
 
   return true;
 };

@@ -82,15 +82,19 @@ export const getCoupons = async (orderId: number) => {
     getOrderProductsByOrderIdQuery(orderId),
   ]);
 
-  const orderTotal = orderProducts.reduce(
-    (sum, p) => sum + p.price * p.quantity,
+  const domainCartItems: CartItem[] = orderProducts.map((p) => ({
+    product: { id: p.id, name: p.name, price: p.price, image: p.image },
+    quantity: p.quantity,
+  }));
+  const orderTotal = domainCartItems.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
     0,
   );
   const now = new Date();
 
   return coupons.map((coupon) => ({
     ...coupon,
-    isCouponUsable: isCouponUsable(coupon, orderTotal, now),
+    isCouponUsable: isCouponUsable(coupon, domainCartItems, orderTotal, now),
   }));
 };
 
