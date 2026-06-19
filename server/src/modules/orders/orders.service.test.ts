@@ -2,7 +2,7 @@ jest.mock("./orders.repository");
 
 import { AppError } from "@/errors/AppError";
 import * as repo from "./orders.repository";
-import { getCoupons, getOrder } from "./orders.service";
+import { getCoupons, getOrder, patchOrder } from "./orders.service";
 
 const mockGetOrderById = repo.getOrderByIdQuery as jest.MockedFunction<
   typeof repo.getOrderByIdQuery
@@ -17,6 +17,15 @@ const mockGetOrderCoupons =
   >;
 const mockGetAllCoupons = repo.getAllCouponsQuery as jest.MockedFunction<
   typeof repo.getAllCouponsQuery
+>;
+const mockUpdateOrderCoupons = repo.updateOrderCouponsQuery as jest.MockedFunction<
+  typeof repo.updateOrderCouponsQuery
+>;
+const mockUpdateOrderIsRemoteArea = repo.updateOrderIsRemoteAreaQuery as jest.MockedFunction<
+  typeof repo.updateOrderIsRemoteAreaQuery
+>;
+const mockUpdateOrderProductGifts = repo.updateOrderProductGiftsQuery as jest.MockedFunction<
+  typeof repo.updateOrderProductGiftsQuery
 >;
 
 const mockOrder = { id: 1, isExpired: false, isRemoteArea: false, deliveryFee: 3000 };
@@ -94,6 +103,78 @@ describe("getCoupons", () => {
     const expired = result.find((c) => c.code === "EXPIRED");
 
     expect(expired?.isCouponUsable).toBe(false);
+  });
+});
+
+const couponFixture = {
+  id: 1,
+  code: "",
+  title: "5000원 할인",
+  discountType: "fixed" as const,
+  discountValue: 5000,
+  minimumAmount: 50000,
+  expirationDate: "2099-12-31",
+};
+
+const expiredCouponFixture = {
+  ...couponFixture,
+  id: 2,
+  expirationDate: "2020-01-01",
+};
+
+describe("patchOrder - 쿠폰 변경", () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it("존재하지 않는 주문이면 NOT_FOUND_ORDER 에러를 던진다", async () => {
+    mockGetOrderById.mockResolvedValue(null);
+
+    await expect(patchOrder(999, { type: "coupon", couponIds: [1] })).rejects.toMatchObject({
+      code: "NOT_FOUND_ORDER",
+    });
+  });
+
+  it("만료된 쿠폰이면 EXPIRED_COUPON 에러를 던진다", async () => {
+    mockGetOrderById.mockResolvedValue(mockOrder);
+    mockGetAllCoupons.mockResolvedValue([expiredCouponFixture]);
+    mockGetOrderProducts.mockResolvedValue(mockProducts);
+
+    await expect(patchOrder(1, { type: "coupon", couponIds: [2] })).rejects.toMatchObject({
+      code: "EXPIRED_COUPON",
+    });
+  });
+
+  it("쿠폰 변경 성공 시 couponIds를 반환한다", async () => {
+    mockGetOrderById.mockResolvedValue(mockOrder);
+    mockGetAllCoupons.mockResolvedValue([couponFixture]);
+    mockGetOrderProducts.mockResolvedValue(mockProducts);
+    mockUpdateOrderCoupons.mockResolvedValue(undefined);
+    mockUpdateOrderProductGifts.mockResolvedValue(undefined);
+
+    const result = await patchOrder(1, { type: "coupon", couponIds: [1] });
+
+    expect(result).toEqual({ couponIds: [1], hasGift: false });
+  });
+});
+
+describe("patchOrder - 배송지 변경", () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it("isRemoteArea 업데이트 후 deliveryFee와 함께 반환한다", async () => {
+    mockGetOrderById.mockResolvedValue(mockOrder);
+    mockUpdateOrderIsRemoteArea.mockResolvedValue(undefined);
+
+    const result = await patchOrder(1, { type: "shipping", isRemoteArea: true });
+
+    expect(result).toEqual({ isRemoteArea: true, deliveryFee: 6000 });
+  });
+
+  it("isRemoteArea false이면 기본 배송비를 반환한다", async () => {
+    mockGetOrderById.mockResolvedValue(mockOrder);
+    mockUpdateOrderIsRemoteArea.mockResolvedValue(undefined);
+
+    const result = await patchOrder(1, { type: "shipping", isRemoteArea: false });
+
+    expect(result).toEqual({ isRemoteArea: false, deliveryFee: 3000 });
   });
 });
 
