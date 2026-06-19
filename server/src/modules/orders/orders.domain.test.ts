@@ -1,5 +1,5 @@
 import type { CartItem, Coupon } from "@/type";
-import { isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
+import { findBogoGiftProductId, isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
 
 const FIXED5000: Coupon = {
   id: 1,
@@ -50,6 +50,23 @@ const makeCartItem = (
 });
 
 const DELIVERY_FEE = 3_000;
+
+describe("findBogoGiftProductId", () => {
+  it("수량 2개 이상인 상품이 없으면 null을 반환한다.", () => {
+    const cartItems = [makeCartItem(1, 50_000, 1)];
+    expect(findBogoGiftProductId(cartItems)).toBeNull();
+  });
+
+  it("수량 2개 이상인 상품 중 단가가 가장 높은 상품 ID를 반환한다.", () => {
+    const cartItems = [makeCartItem(1, 20_000, 2), makeCartItem(2, 30_000, 2)];
+    expect(findBogoGiftProductId(cartItems)).toBe(2);
+  });
+
+  it("수량 1개인 상품은 대상에서 제외된다.", () => {
+    const cartItems = [makeCartItem(1, 50_000, 1), makeCartItem(2, 20_000, 2)];
+    expect(findBogoGiftProductId(cartItems)).toBe(2);
+  });
+});
 
 describe("isCouponUsable", () => {
   const orderTotal = 100_000;
