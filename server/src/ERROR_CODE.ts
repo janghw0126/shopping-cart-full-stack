@@ -64,6 +64,11 @@ const ERROR_CODES = {
     message: "재고가 없는 상품입니다.",
     status: 404,
   },
+  NOT_FOUND_ORDER: {
+    code: "NOT_FOUND_ORDER",
+    message: "존재하지 않는 주문입니다.",
+    status: 404,
+  },
 } as const;
 
 export default ERROR_CODES;
