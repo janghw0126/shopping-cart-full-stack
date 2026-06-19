@@ -2,6 +2,15 @@ import { supabase } from "@db/supabase";
 import type { Coupon, Product } from "@/type";
 import type { OrderProduct } from "./orders.schema";
 
+export type OrderRow = {
+  id: number;
+  isExpired: boolean;
+  isRemoteArea: boolean;
+  deliveryFee: number;
+};
+
+export type OrderProductRow = Product & { quantity: number };
+
 type ProductWithStock = Product & { stock: number };
 
 const mapToCoupon = (row: Record<string, unknown>): Coupon => ({
