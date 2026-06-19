@@ -1,6 +1,7 @@
 import express from "express";
-import { postOrder } from "./orders.controller";
+import { postOrder, getOrder } from "./orders.controller";
 
 export const ordersRouter = express.Router();
 
 ordersRouter.post("/", postOrder);
+ordersRouter.get("/:orderId", getOrder);
