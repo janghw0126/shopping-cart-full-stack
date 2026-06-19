@@ -183,3 +183,53 @@ export const getOrderCouponsByOrderIdQuery = async (
     .filter(Boolean)
     .map((c) => mapToCoupon(c as unknown as Record<string, unknown>));
 };
+
+export const updateOrderCouponsQuery = async (
+  orderId: number,
+  couponIds: number[],
+): Promise<void> => {
+  const { error: deleteError } = await supabase
+    .from("order_coupons")
+    .delete()
+    .eq("order_id", orderId);
+  if (deleteError) throw new Error("주문 쿠폰 삭제에 실패했습니다.");
+
+  if (couponIds.length === 0) return;
+
+  const rows = couponIds.map((couponId) => ({
+    order_id: orderId,
+    coupon_id: couponId,
+  }));
+  const { error: insertError } = await supabase.from("order_coupons").insert(rows);
+  if (insertError) throw new Error("주문 쿠폰 저장에 실패했습니다.");
+};
+
+export const updateOrderIsRemoteAreaQuery = async (
+  orderId: number,
+  isRemoteArea: boolean,
+  deliveryFee: number,
+): Promise<void> => {
+  const { error } = await supabase
+    .from("orders")
+    .update({ is_remote_area: isRemoteArea, delivery_fee: deliveryFee })
+    .eq("id", orderId);
+  if (error) throw new Error("배송지 정보 업데이트에 실패했습니다.");
+};
+
+export const updateOrderProductGiftsQuery = async (
+  orderId: number,
+  giftProductId: number | null,
+): Promise<void> => {
+  await supabase
+    .from("order_products")
+    .update({ is_gift: false })
+    .eq("order_id", orderId);
+
+  if (giftProductId !== null) {
+    await supabase
+      .from("order_products")
+      .update({ is_gift: true })
+      .eq("order_id", orderId)
+      .eq("product_id", giftProductId);
+  }
+};
