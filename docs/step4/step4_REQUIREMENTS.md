@@ -57,7 +57,6 @@
 
 - [x] DB에서 order, order_products, order_coupons 를 조회한다. (SELECT order, product)
 - [x] products, coupons, isRemoteArea, deliveryFee를 프론트에게 반환한다.
-
 - [x] 주문 만료 여부를 검사한다. (후순위)
 
 실패 케이스
@@ -105,16 +104,16 @@
 
 정상 케이스
 
-- [ ] request body에 따라 쿠폰 또는 배송지 정보를 업데이트한다.
-- [ ] 쿠폰 변경 시: order_coupons에 선택된 쿠폰을 업데이트한다. (2+1 쿠폰의 경우 hasGift도 변경)
-- [ ] 배송지 변경 시: order의 isRemoteArea를 업데이트한다.
-- [ ] 변경된 항목을 응답한다.
+- [x] request body에 따라 쿠폰 또는 배송지 정보를 업데이트한다.
+- [x] 쿠폰 변경 시: order_coupons에 선택된 쿠폰을 업데이트한다. (2+1 쿠폰의 경우 hasGift도 변경)
+- [x] 배송지 변경 시: order의 isRemoteArea를 업데이트한다.
+- [x] 변경된 항목을 응답한다.
 
 실패 케이스
 
-- [ ] 타입 불일치 시 400 반환
-- [ ] 필수값 누락 시 400 반환
-- [ ] 쿠폰 만료 시 404 반환 (쿠폰 변경 요청 시에만 해당)
+- [x] 타입 불일치 시 400 반환
+- [x] 필수값 누락 시 400 반환
+- [x] 쿠폰 만료 시 404 반환 (쿠폰 변경 요청 시에만 해당)
 
 ---
 
