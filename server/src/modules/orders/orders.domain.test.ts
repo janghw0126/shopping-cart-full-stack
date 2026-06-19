@@ -1,5 +1,5 @@
 import type { CartItem, Coupon } from "@/type";
-import { selectTopTwoCoupons } from "./orders.domain";
+import { isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
 
 const FIXED5000: Coupon = {
   id: 1,
@@ -50,6 +50,46 @@ const makeCartItem = (
 });
 
 const DELIVERY_FEE = 3_000;
+
+describe("isCouponUsable", () => {
+  const orderTotal = 100_000;
+
+  it("만료일이 지난 쿠폰은 사용 불가하다.", () => {
+    const expired: Coupon = { ...FIXED5000, expirationDate: "2024-01-01" };
+    expect(isCouponUsable(expired, orderTotal, new Date("2025-01-01"))).toBe(false);
+  });
+
+  it("만료일이 오늘인 쿠폰은 사용 가능하다.", () => {
+    const today = new Date("2026-06-30T12:00:00");
+    const coupon: Coupon = { ...FIXED5000, expirationDate: "2026-06-30" };
+    expect(isCouponUsable(coupon, orderTotal, today)).toBe(true);
+  });
+
+  it("최소 주문 금액 미달이면 사용 불가하다.", () => {
+    const coupon: Coupon = { ...FIXED5000, minimumAmount: 200_000, expirationDate: "2099-12-31" };
+    expect(isCouponUsable(coupon, 100_000, new Date())).toBe(false);
+  });
+
+  it("최소 주문 금액 이상이면 사용 가능하다.", () => {
+    const coupon: Coupon = { ...FIXED5000, minimumAmount: 50_000, expirationDate: "2099-12-31" };
+    expect(isCouponUsable(coupon, 100_000, new Date())).toBe(true);
+  });
+
+  it("minimumAmount가 없으면 금액 조건 없이 사용 가능하다.", () => {
+    const coupon: Coupon = { ...BOGO, expirationDate: "2099-12-31" };
+    expect(isCouponUsable(coupon, 1_000, new Date())).toBe(true);
+  });
+
+  it("사용 가능 시간이 아니면 사용 불가하다.", () => {
+    const coupon: Coupon = { ...MIRACLESALE, expirationDate: "2099-12-31" };
+    expect(isCouponUsable(coupon, orderTotal, new Date("2026-07-01T12:00:00"))).toBe(false);
+  });
+
+  it("사용 가능 시간이면 사용 가능하다.", () => {
+    const coupon: Coupon = { ...MIRACLESALE, expirationDate: "2099-12-31" };
+    expect(isCouponUsable(coupon, orderTotal, new Date("2026-07-01T05:00:00"))).toBe(true);
+  });
+});
 
 describe("selectTopTwoCoupons", () => {
   describe("쿠폰 개수", () => {
