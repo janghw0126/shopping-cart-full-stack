@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import { validateCreateOrder } from "./orders.schema";
-import { createOrder, getOrder as getOrderService } from "./orders.service";
+import { createOrder, getCoupons as getCouponsService, getOrder as getOrderService } from "./orders.service";
 
 export const postOrder: RequestHandler = async (req, res) => {
   const body = validateCreateOrder(req.body);
@@ -17,6 +17,16 @@ export const postOrder: RequestHandler = async (req, res) => {
 export const getOrder: RequestHandler = async (req, res) => {
   const orderId = Number(req.params.orderId);
   const result = await getOrderService(orderId);
+
+  res.status(200).json({
+    status: "success",
+    data: result,
+  });
+};
+
+export const getCoupons: RequestHandler = async (req, res) => {
+  const orderId = Number(req.params.orderId);
+  const result = await getCouponsService(orderId);
 
   res.status(200).json({
     status: "success",
