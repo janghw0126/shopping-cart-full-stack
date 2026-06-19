@@ -1,7 +1,7 @@
 import { AppError } from "@/errors/AppError";
 import type { CartItem } from "@/type";
-import { isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
-import type { OrderProduct } from "./orders.schema";
+import { findBogoGiftProductId, isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
+import type { OrderProduct, PatchOrderBody } from "./orders.schema";
 import {
   createOrderCouponsQuery,
   createOrderProductsQuery,
@@ -13,6 +13,9 @@ import {
   getProductWithStockQuery,
   getProductsByIdsQuery,
   reserveProductsQuery,
+  updateOrderCouponsQuery,
+  updateOrderIsRemoteAreaQuery,
+  updateOrderProductGiftsQuery,
 } from "./orders.repository";
 
 const BASE_DELIVERY_FEE = 3_000;
@@ -71,6 +74,44 @@ export const createOrder = async (orderProducts: OrderProduct[]) => {
   }
 
   return { orderId: order.id };
+};
+
+const REMOTE_AREA_FEE = 3_000;
+
+export const patchOrder = async (orderId: number, body: PatchOrderBody) => {
+  const order = await getOrderByIdQuery(orderId);
+  if (!order) throw new AppError("NOT_FOUND_ORDER");
+
+  if (body.type === "coupon") {
+    const [coupons, orderProducts] = await Promise.all([
+      getAllCouponsQuery(),
+      getOrderProductsByOrderIdQuery(orderId),
+    ]);
+
+    const selectedCoupons = coupons.filter((c) => body.couponIds.includes(c.id));
+    const now = new Date();
+    for (const coupon of selectedCoupons) {
+      const expirationDay = new Date(coupon.expirationDate);
+      expirationDay.setHours(23, 59, 59, 999);
+      if (expirationDay < now) throw new AppError("EXPIRED_COUPON");
+    }
+
+    await updateOrderCouponsQuery(orderId, body.couponIds);
+
+    const domainCartItems: CartItem[] = orderProducts.map((p) => ({
+      product: { id: p.id, name: p.name, price: p.price, image: p.image },
+      quantity: p.quantity,
+    }));
+    const hasBogo = selectedCoupons.some((c) => c.discountType === "buyXgetY");
+    const giftProductId = hasBogo ? findBogoGiftProductId(domainCartItems) : null;
+    await updateOrderProductGiftsQuery(orderId, giftProductId);
+
+    return { couponIds: body.couponIds, hasGift: giftProductId !== null };
+  }
+
+  const deliveryFee = BASE_DELIVERY_FEE + (body.isRemoteArea ? REMOTE_AREA_FEE : 0);
+  await updateOrderIsRemoteAreaQuery(orderId, body.isRemoteArea, deliveryFee);
+  return { isRemoteArea: body.isRemoteArea, deliveryFee };
 };
 
 export const getCoupons = async (orderId: number) => {
