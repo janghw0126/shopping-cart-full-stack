@@ -69,6 +69,16 @@ const ERROR_CODES = {
     message: "존재하지 않는 주문입니다.",
     status: 404,
   },
+  EXPIRED_COUPON: {
+    code: "EXPIRED_COUPON",
+    message: "만료된 쿠폰입니다.",
+    status: 404,
+  },
+  INVALID_PATCH_ORDER: {
+    code: "INVALID_PATCH_ORDER",
+    message: "유효하지 않은 주문 변경 요청입니다.",
+    status: 400,
+  },
 } as const;
 
 export default ERROR_CODES;
