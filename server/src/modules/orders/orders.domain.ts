@@ -2,7 +2,9 @@ import type { CartItem, Coupon } from "@/type";
 
 const isWithinAvailableTime = (coupon: Coupon, now: Date): boolean => {
   if (!coupon.availableTime) return true;
-  const [startHour, startMin] = coupon.availableTime.start.split(":").map(Number);
+  const [startHour, startMin] = coupon.availableTime.start
+    .split(":")
+    .map(Number);
   const [endHour, endMin] = coupon.availableTime.end.split(":").map(Number);
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   return (
@@ -47,16 +49,17 @@ const calculateCombinedDiscount = (
   deliveryFee: number,
   now: Date,
 ): number => {
-  // 1. 정액 쿠폰 먼저 적용 (fixed, buyXgetY)
+  // 정액 쿠폰 먼저 적용 (fixed, buyXgetY)
   const fixedDiscount = combination
     .filter((c) => c.discountType === "fixed" || c.discountType === "buyXgetY")
     .reduce(
       (sum, c) =>
-        sum + calculateDiscountAmount(c, cartItems, orderTotal, deliveryFee, now),
+        sum +
+        calculateDiscountAmount(c, cartItems, orderTotal, deliveryFee, now),
       0,
     );
 
-  // 2. 정율 쿠폰은 할인된 금액에 적용
+  // 정율 쿠폰은 할인된 금액에 적용
   const discountedTotal = Math.max(0, orderTotal - fixedDiscount);
   const percentageDiscount = combination
     .filter((c) => c.discountType === "percentage")
@@ -65,7 +68,7 @@ const calculateCombinedDiscount = (
       return sum + discountedTotal * (c.discountValue / 100);
     }, 0);
 
-  // 3. 배송비 쿠폰은 orderTotal과 독립적으로 적용
+  // 배송비 쿠폰은 orderTotal과 독립적으로 적용해서 계산 -> 주문 금액을 기준으로
   const shippingDiscount = combination
     .filter((c) => c.discountType === "freeShipping")
     .reduce((sum, c) => {
