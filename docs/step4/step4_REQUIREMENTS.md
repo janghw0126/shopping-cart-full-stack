@@ -55,13 +55,14 @@
 
 정상 케이스
 
-- [ ] DB에서 order, order_products, order_coupons 를 조회한다. (SELECT order, product)
-- [ ] 주문 만료 여부를 검사한다.
-- [ ] products, coupons, isRemoteArea, deliveryFee를 프론트에게 반환한다.
+- [x] DB에서 order, order_products, order_coupons 를 조회한다. (SELECT order, product)
+- [x] products, coupons, isRemoteArea, deliveryFee를 프론트에게 반환한다.
+
+- [x] 주문 만료 여부를 검사한다. (후순위)
 
 실패 케이스
 
-- [ ] 주문이 만료된 경우 404 반환
+- [x] 주문이 만료된 경우 404 반환 (후순위)
 
 ---
 
