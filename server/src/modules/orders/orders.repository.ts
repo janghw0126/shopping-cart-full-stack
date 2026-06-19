@@ -117,3 +117,59 @@ export const createOrderCouponsQuery = async (
   const { error } = await supabase.from("order_coupons").insert(rows);
   if (error) throw new Error("주문 쿠폰 저장에 실패했습니다.");
 };
+
+export const getOrderByIdQuery = async (
+  orderId: number,
+): Promise<OrderRow | null> => {
+  const { data, error } = await supabase
+    .from("orders")
+    .select("id, is_expired, is_remote_area, delivery_fee")
+    .eq("id", orderId)
+    .single();
+
+  if (error || !data) return null;
+  return {
+    id: data.id,
+    isExpired: data.is_expired,
+    isRemoteArea: data.is_remote_area,
+    deliveryFee: data.delivery_fee,
+  };
+};
+
+export const getOrderProductsByOrderIdQuery = async (
+  orderId: number,
+): Promise<OrderProductRow[]> => {
+  const { data, error } = await supabase
+    .from("order_products")
+    .select("quantity, price, products(id, name, image)")
+    .eq("order_id", orderId);
+
+  if (error || !data) return [];
+
+  return data.map((row) => {
+    const product = row.products as unknown as { id: number; name: string; image: string };
+    return {
+      id: product.id,
+      name: product.name,
+      image: product.image,
+      price: row.price as number,
+      quantity: row.quantity as number,
+    };
+  });
+};
+
+export const getOrderCouponsByOrderIdQuery = async (
+  orderId: number,
+): Promise<Coupon[]> => {
+  const { data, error } = await supabase
+    .from("order_coupons")
+    .select("coupons(*)")
+    .eq("order_id", orderId);
+
+  if (error || !data) return [];
+
+  return data
+    .map((row) => row.coupons)
+    .filter(Boolean)
+    .map((c) => mapToCoupon(c as unknown as Record<string, unknown>));
+};
