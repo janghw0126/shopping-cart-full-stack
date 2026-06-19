@@ -17,6 +17,38 @@ const isOrderProduct = (item: unknown): item is OrderProduct =>
   typeof (item as OrderProduct).id === "number" &&
   typeof (item as OrderProduct).quantity === "number";
 
+export interface PatchOrderCouponBody {
+  type: "coupon";
+  couponIds: number[];
+}
+
+export interface PatchOrderShippingBody {
+  type: "shipping";
+  isRemoteArea: boolean;
+}
+
+export type PatchOrderBody = PatchOrderCouponBody | PatchOrderShippingBody;
+
+export const validatePatchOrder = (body: unknown): PatchOrderBody => {
+  if (!body || typeof body !== "object") throw new AppError("INVALID_PATCH_ORDER");
+  const b = body as Record<string, unknown>;
+
+  if (b.type === "coupon") {
+    if (
+      !Array.isArray(b.couponIds) ||
+      !b.couponIds.every((id) => typeof id === "number")
+    ) throw new AppError("INVALID_PATCH_ORDER");
+    return { type: "coupon", couponIds: b.couponIds as number[] };
+  }
+
+  if (b.type === "shipping") {
+    if (typeof b.isRemoteArea !== "boolean") throw new AppError("INVALID_PATCH_ORDER");
+    return { type: "shipping", isRemoteArea: b.isRemoteArea };
+  }
+
+  throw new AppError("INVALID_PATCH_ORDER");
+};
+
 export const validateCreateOrder = (body: unknown): CreateOrderBody => {
   if (
     !body ||

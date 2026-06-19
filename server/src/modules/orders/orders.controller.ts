@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
-import { validateCreateOrder } from "./orders.schema";
-import { createOrder, getCoupons as getCouponsService, getOrder as getOrderService } from "./orders.service";
+import { validateCreateOrder, validatePatchOrder } from "./orders.schema";
+import { createOrder, getCoupons as getCouponsService, getOrder as getOrderService, patchOrder as patchOrderService } from "./orders.service";
 
 export const postOrder: RequestHandler = async (req, res) => {
   const body = validateCreateOrder(req.body);
@@ -27,6 +27,17 @@ export const getOrder: RequestHandler = async (req, res) => {
 export const getCoupons: RequestHandler = async (req, res) => {
   const orderId = Number(req.params.orderId);
   const result = await getCouponsService(orderId);
+
+  res.status(200).json({
+    status: "success",
+    data: result,
+  });
+};
+
+export const patchOrder: RequestHandler = async (req, res) => {
+  const orderId = Number(req.params.orderId);
+  const body = validatePatchOrder(req.body);
+  const result = await patchOrderService(orderId, body);
 
   res.status(200).json({
     status: "success",
