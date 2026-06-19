@@ -1,5 +1,5 @@
 import type { CartItem, Coupon } from "@/type";
-import { findBogoGiftProductId, isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
+import { calculateFinalAmount, findBogoGiftProductId, isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
 
 const FIXED5000: Coupon = {
   id: 1,
@@ -50,6 +50,33 @@ const makeCartItem = (
 });
 
 const DELIVERY_FEE = 3_000;
+
+describe("calculateFinalAmount", () => {
+  it("쿠폰이 없으면 orderTotal + deliveryFee를 반환한다.", () => {
+    const cartItems = [makeCartItem(1, 50_000, 1)];
+    expect(calculateFinalAmount([], cartItems, 50_000, DELIVERY_FEE)).toBe(53_000);
+  });
+
+  it("정액 쿠폰 적용 시 할인 금액을 차감한다.", () => {
+    const cartItems = [makeCartItem(1, 100_000, 1)];
+    // 100,000 - 5,000 + 3,000 = 98,000
+    expect(calculateFinalAmount([FIXED5000], cartItems, 100_000, DELIVERY_FEE)).toBe(98_000);
+  });
+
+  it("무료 배송 쿠폰 적용 시 배송비가 0원이 된다.", () => {
+    const cartItems = [makeCartItem(1, 50_000, 1)];
+    // 50,000 + 3,000 - 3,000 = 50,000
+    expect(calculateFinalAmount([FREESHIPPING], cartItems, 50_000, DELIVERY_FEE)).toBe(50_000);
+  });
+
+  it("정액 + 무료 배송 쿠폰 동시 적용 시 둘 다 차감된다.", () => {
+    const cartItems = [makeCartItem(1, 100_000, 1)];
+    // 100,000 - 5,000 + 3,000 - 3,000 = 95,000
+    expect(
+      calculateFinalAmount([FIXED5000, FREESHIPPING], cartItems, 100_000, DELIVERY_FEE),
+    ).toBe(95_000);
+  });
+});
 
 describe("findBogoGiftProductId", () => {
   it("수량 2개 이상인 상품이 없으면 null을 반환한다.", () => {
