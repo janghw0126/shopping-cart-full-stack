@@ -7,6 +7,9 @@ import {
   createOrderProductsQuery,
   createOrderQuery,
   getAllCouponsQuery,
+  getOrderByIdQuery,
+  getOrderCouponsByOrderIdQuery,
+  getOrderProductsByOrderIdQuery,
   getProductWithStockQuery,
   getProductsByIdsQuery,
   reserveProductsQuery,
@@ -68,4 +71,21 @@ export const createOrder = async (orderProducts: OrderProduct[]) => {
   }
 
   return { orderId: order.id };
+};
+
+export const getOrder = async (orderId: number) => {
+  const order = await getOrderByIdQuery(orderId);
+  if (!order) throw new AppError("NOT_FOUND_ORDER");
+
+  const [products, coupons] = await Promise.all([
+    getOrderProductsByOrderIdQuery(orderId),
+    getOrderCouponsByOrderIdQuery(orderId),
+  ]);
+
+  return {
+    products,
+    coupons,
+    isRemoteArea: order.isRemoteArea,
+    deliveryFee: order.deliveryFee,
+  };
 };
