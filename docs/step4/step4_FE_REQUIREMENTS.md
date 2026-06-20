@@ -7,7 +7,7 @@
 - [ ] 주문 확인 버튼 클릭 -> `POST /orders` 호출 후 `/checkout/:orderId`로 이동
   - request: `{ products: [{ id, quantity }] }`
   - response: `{ status: "success", data: { orderId: number } }`
-  - 에러: 재고 부족(`OUT_OF_STOCK`) / 상품 없음(`NOT_EXIST_PRODUCT`) → 알림 표시
+  - 에러: 재고 부족(`OUT_OF_STOCK`) / 상품 없음(`NOT_EXIST_PRODUCT`) -> 알림 표시
 
 ---
 
@@ -24,7 +24,7 @@
 
 - [ ] 페이지 진입 시 주문 정보 조회 `GET /orders/:orderId`
   - response: `{ status: "success", data: { products, coupons, isRemoteArea, deliveryFee } }`
-- [ ] 배송지 체크박스 변경 → `PATCH /orders/:orderId` 호출
+- [ ] 배송지 체크박스 변경 -> `PATCH /orders/:orderId` 호출
   - request: `{ type: "remoteArea", isRemoteArea: boolean }`
   - response: `{ status: "success", data: { isRemoteArea, deliveryFee } }`
   - 성공 시 배송비 업데이트 (낙관적 업데이트)
@@ -33,7 +33,7 @@
   - request: `{ orderId: number, amount: number }`
   - response: `{ status: "success", data: { finalAmount: number } }`
   - 에러 `PAYMENT_AMOUNT_MISMATCH`: 알림 표시 후 `/cart`로 리다이렉트
-  - 에러 `EXPIRED_COUPON`: 만료 쿠폰 알림 표시 → 확인 클릭 시 `GET /orders/:orderId` 재조회 → FE에서 할인 금액 재계산 → 화면 업데이트
+  - 에러 `EXPIRED_COUPON`: 만료 쿠폰 알림 표시 -> 확인 클릭 시 `GET /orders/:orderId` 재조회 -> FE에서 할인 금액 재계산 -> 화면 업데이트
 
 ---
 
@@ -64,7 +64,7 @@
 ### UI
 
 - [ ] 총 결제 금액 표시
-- [ ] 장바구니로 돌아가기 버튼 → `/cart`로 이동
+- [ ] 장바구니로 돌아가기 버튼 -> `/cart`로 이동
 
 ---
 
