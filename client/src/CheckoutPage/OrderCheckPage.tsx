@@ -4,7 +4,11 @@ import { Header } from "../common/Header";
 import { Button } from "../common/Button";
 import { Checkbox } from "../common/Checkbox";
 import { Spinner } from "../common/Spinner";
-import { getOrderApi, patchOrderShippingApi } from "../api/orderApi";
+import {
+  getOrderApi,
+  patchOrderShippingApi,
+  postPaymentApi,
+} from "../api/orderApi";
 import { CouponModal } from "./CouponModal";
 import type { OrderDetail } from "../types/order";
 
@@ -58,6 +62,31 @@ export function OrderCheckPage() {
   const couponDiscount = fixedDiscount + percentageDiscount + shippingDiscount;
   const giftCoupon = order.coupons.find((c) => c.discountType === "buyXgetY");
   const totalAmount = orderAmount - couponDiscount + order.deliveryFee;
+
+  async function handlePayment() {
+    try {
+      const { finalAmount } = await postPaymentApi(
+        Number(orderId),
+        totalAmount,
+      );
+      navigate("/payment/confirm", { state: { finalAmount } });
+    } catch (e) {
+      const code = e instanceof Error ? e.message : "";
+      if (code === "PAYMENT_AMOUNT_MISMATCH") {
+        alert("결제 금액이 일치하지 않습니다.");
+        navigate("/cart");
+      } else if (code === "EXPIRED_COUPON") {
+        alert(
+          "만료된 쿠폰이 포함되어 있습니다. 쿠폰 정보를 다시 확인해 주세요.",
+        );
+        getOrderApi(orderId!)
+          .then(setOrder)
+          .catch(() => alert("주문 정보를 불러오는 데 실패했습니다."));
+      } else {
+        alert("결제에 실패했습니다. 다시 시도해 주세요.");
+      }
+    }
+  }
 
   async function handleRemoteAreaChange(checked: boolean) {
     const prevOrder = order;
@@ -144,7 +173,7 @@ export function OrderCheckPage() {
         </div>
       </div>
 
-      <Button label="결제하기" onClick={() => {}} />
+      <Button label="결제하기" onClick={handlePayment} />
 
       {isModalOpen && (
         <CouponModal
