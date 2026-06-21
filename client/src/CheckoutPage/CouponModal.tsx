@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import styled from "@emotion/styled";
 import type { CouponItem } from "../types/order";
 import { getCouponsApi, patchOrderCouponApi } from "../api/orderApi";
 import { calculateCouponDiscount } from "../utils/couponUtils";
 import { Checkbox } from "../common/Checkbox";
-import { Button } from "../common/Button";
 import { Spinner } from "../common/Spinner";
 
 interface CouponModalProps {
@@ -15,6 +15,112 @@ interface CouponModalProps {
   onClose: () => void;
   onApply: () => void;
 }
+
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+`;
+
+const ModalCard = styled.div`
+  background: #fff;
+  border-radius: 12px;
+  width: calc(100% - 48px);
+  max-width: 480px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+`;
+
+const Divider = styled.div`
+  height: 1px;
+  background-color: #eee;
+  margin: 0 24px;
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px;
+`;
+
+const ModalTitle = styled.span`
+  font-size: 18px;
+  font-weight: bold;
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  color: #333;
+`;
+
+const InfoText = styled.p`
+  font-size: 12px;
+  color: #555;
+  padding: 12px 24px;
+`;
+
+const CouponList = styled.ul`
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  list-style: none;
+`;
+
+const CouponItem = styled.li<{ disabled: boolean }>`
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 20px 0;
+  margin: 0 24px;
+  border-top: 1px solid #eee;
+  opacity: ${({ disabled }) => (disabled ? 0.4 : 1)};
+`;
+
+const CouponInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const CouponTitle = styled.span`
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+const CouponDetail = styled.p`
+  font-size: 12px;
+  color: #555;
+`;
+
+const ApplyButton = styled.button`
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 16px 24px;
+  width: calc(100% - 48px);
+
+  &:disabled {
+    background-color: #bebebe;
+    cursor: not-allowed;
+  }
+`;
 
 export function CouponModal({
   orderId,
@@ -68,63 +174,61 @@ export function CouponModal({
   }
 
   return (
-    <div onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()}>
-        <div>
-          <span>쿠폰을 선택해 주세요</span>
-          <button onClick={onClose}>✕</button>
-        </div>
-        <p>ⓘ 쿠폰은 최대 2개까지 사용할 수 있습니다.</p>
+    <Overlay onClick={onClose}>
+      <ModalCard onClick={(e) => e.stopPropagation()}>
+        <ModalHeader>
+          <ModalTitle>쿠폰을 선택해 주세요</ModalTitle>
+          <CloseButton onClick={onClose}>✕</CloseButton>
+        </ModalHeader>
+        <Divider />
+        <InfoText>ⓘ 쿠폰은 최대 2개까지 사용할 수 있습니다.</InfoText>
         {loading ? (
           <Spinner />
         ) : (
-          <ul>
+          <CouponList>
             {coupons.map((coupon) => {
               const isSelected = selectedIds.includes(coupon.id);
               const isDisabled = !coupon.isCouponUsable;
               const isMaxed = selectedIds.length >= 2 && !isSelected;
 
               return (
-                <li key={coupon.id}>
+                <CouponItem key={coupon.id} disabled={isDisabled}>
                   <Checkbox
                     checked={isSelected}
                     onChange={() => {
                       if (!isDisabled && !isMaxed) handleToggle(coupon.id);
                     }}
                   />
-                  <div>
-                    <span>{coupon.title}</span>
-                    <p>
+                  <CouponInfo>
+                    <CouponTitle>{coupon.title}</CouponTitle>
+                    <CouponDetail>
                       만료일:{" "}
                       {new Date(coupon.expirationDate).toLocaleDateString(
                         "ko-KR",
                       )}
-                    </p>
+                    </CouponDetail>
                     {coupon.minimumAmount && (
-                      <p>
+                      <CouponDetail>
                         최소 주문 금액: {coupon.minimumAmount.toLocaleString()}
                         원
-                      </p>
+                      </CouponDetail>
                     )}
                     {coupon.availableTime && (
-                      <p>
+                      <CouponDetail>
                         사용 가능 시간: {coupon.availableTime.start} ~{" "}
                         {coupon.availableTime.end}
-                      </p>
+                      </CouponDetail>
                     )}
-                    {isDisabled && <span>사용 불가</span>}
-                  </div>
-                </li>
+                  </CouponInfo>
+                </CouponItem>
               );
             })}
-          </ul>
+          </CouponList>
         )}
-        <Button
-          label={`총 ${discount.toLocaleString()}원 할인 쿠폰 사용하기`}
-          onClick={handleApply}
-          disabled={applying}
-        />
-      </div>
-    </div>
+        <ApplyButton onClick={handleApply} disabled={applying}>
+          총 {discount.toLocaleString()}원 할인 쿠폰 사용하기
+        </ApplyButton>
+      </ModalCard>
+    </Overlay>
   );
 }
