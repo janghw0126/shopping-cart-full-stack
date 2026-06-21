@@ -45,7 +45,7 @@ const TotalAmount = styled.p`
   text-align: center;
 `;
 
-export function PaymentConfirm() {
+export function PaymentConfirmPage() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const finalAmount = state?.finalAmount as number;
