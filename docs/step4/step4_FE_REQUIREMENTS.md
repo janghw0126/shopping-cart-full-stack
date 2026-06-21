@@ -4,7 +4,7 @@
 
 ### 이벤트
 
-- [ ] 주문 확인 버튼 클릭 -> `POST /orders` 호출 후 `/checkout/:orderId`로 이동
+- [x] 주문 확인 버튼 클릭 -> `POST /orders` 호출 후 `/checkout/:orderId`로 이동
   - request: `{ products: [{ id, quantity }] }`
   - response: `{ status: "success", data: { orderId: number } }`
   - 에러: 재고 부족(`OUT_OF_STOCK`) / 상품 없음(`NOT_EXIST_PRODUCT`) -> 알림 표시
