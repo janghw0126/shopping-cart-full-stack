@@ -1,5 +1,4 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Header } from "../common/Header";
 import { Button } from "../common/Button";
 
 export function PaymentConfirmPage() {
@@ -10,8 +9,9 @@ export function PaymentConfirmPage() {
   const totalQuantity = state?.totalQuantity as number;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Header onBack={() => navigate("/cart")} />
+    <div
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
       <div
         style={{
           flex: 1,
