@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "../common/Spinner";
 import { ErrorMessage } from "../common/ErrorMessage";
@@ -14,6 +15,7 @@ import type { OrderCheckInfo } from "../types/cart";
 
 export function CartPage() {
   const navigate = useNavigate();
+  const [ordering, setOrdering] = useState(false);
   const { loading, error, cartItems, updateQuantity, deleteItem } = useCart({
     fetchCart: getCartApi,
     updateCart: updateQuantityApi,
@@ -21,6 +23,7 @@ export function CartPage() {
   });
 
   async function handleOrderCheck({ products }: OrderCheckInfo) {
+    setOrdering(true);
     try {
       const orderId = await createOrderApi(products);
       navigate(`/checkout/${orderId}`);
@@ -34,6 +37,8 @@ export function CartPage() {
           alert("주문에 실패했습니다. 다시 시도해 주세요.");
         }
       }
+    } finally {
+      setOrdering(false);
     }
   }
 
@@ -47,6 +52,7 @@ export function CartPage() {
       onUpdateQuantity={updateQuantity}
       onDeleteItem={deleteItem}
       onOrderCheck={handleOrderCheck}
+      ordering={ordering}
     />
   );
 }

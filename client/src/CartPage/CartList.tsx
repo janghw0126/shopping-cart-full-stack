@@ -13,6 +13,7 @@ interface CartListProps {
   onUpdateQuantity: (productId: number, quantity: number) => void;
   onDeleteItem: (productId: number) => void;
   onOrderCheck: (info: OrderCheckInfo) => void;
+  ordering: boolean;
 }
 
 export function CartList({
@@ -20,6 +21,7 @@ export function CartList({
   onUpdateQuantity,
   onDeleteItem,
   onOrderCheck,
+  ordering,
 }: CartListProps) {
   const { isSelected, allSelected, toggleItem, toggleAll } =
     useCartSelection(cartItems);
@@ -42,7 +44,7 @@ export function CartList({
 
   return (
     <PageLayout
-      footer={<Button label="주문 확인" onClick={handleOrderCheck} />}
+      footer={<Button label="주문 확인" onClick={handleOrderCheck} disabled={ordering} />}
     >
       <CartHeader itemCount={cartItems.length} />
       <CartItems
