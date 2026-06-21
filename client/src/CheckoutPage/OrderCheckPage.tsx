@@ -39,7 +39,25 @@ export function OrderCheckPage() {
     (sum, product) => sum + product.price * product.quantity,
     0,
   );
-  const totalAmount = orderAmount + order.deliveryFee;
+
+  const fixedDiscount = order.coupons
+    .filter((coupon) => coupon.discountType === "fixed")
+    .reduce((sum, coupon) => sum + coupon.discountValue, 0);
+  const percentageDiscount = order.coupons
+    .filter((coupon) => coupon.discountType === "percentage")
+    .reduce(
+      (sum, coupon) =>
+        sum + (orderAmount - fixedDiscount) * (coupon.discountValue / 100),
+      0,
+    );
+  const shippingDiscount = order.coupons.some(
+    (coupon) => coupon.discountType === "freeShipping",
+  )
+    ? order.deliveryFee
+    : 0;
+  const couponDiscount = fixedDiscount + percentageDiscount + shippingDiscount;
+  const giftCoupon = order.coupons.find((c) => c.discountType === "buyXgetY");
+  const totalAmount = orderAmount - couponDiscount + order.deliveryFee;
 
   async function handleRemoteAreaChange(checked: boolean) {
     const prevOrder = order;
@@ -101,6 +119,16 @@ export function OrderCheckPage() {
         <div>
           <span>주문 금액</span>
           <span>{orderAmount.toLocaleString()}원</span>
+        </div>
+        {giftCoupon && (
+          <div>
+            <span>증정품</span>
+            <span>{giftCoupon.title} 증정품이 포함되어 있습니다</span>
+          </div>
+        )}
+        <div>
+          <span>쿠폰 할인 금액</span>
+          <span>-{couponDiscount.toLocaleString()}원</span>
         </div>
         <div>
           <span>배송비</span>
