@@ -5,6 +5,7 @@ import { Button } from "../common/Button";
 import { Checkbox } from "../common/Checkbox";
 import { Spinner } from "../common/Spinner";
 import { getOrderApi, patchOrderShippingApi } from "../api/orderApi";
+import { CouponModal } from "./CouponModal";
 import type { OrderDetail } from "../types/order";
 
 export function OrderCheckPage() {
@@ -13,12 +14,17 @@ export function OrderCheckPage() {
 
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [hasGift, setHasGift] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
 
     getOrderApi(orderId)
-      .then((data) => setOrder(data))
+      .then((data) => {
+        setOrder(data);
+      })
       .catch(() => alert("주문 정보를 불러오는 데 실패했습니다."))
       .finally(() => setLoading(false));
   }, [orderId]);
@@ -35,7 +41,6 @@ export function OrderCheckPage() {
     (sum, product) => sum + product.price * product.quantity,
     0,
   );
-  const couponDiscount = 0;
   const totalAmount = orderAmount - couponDiscount + order.deliveryFee;
 
   async function handleRemoteAreaChange(checked: boolean) {
@@ -52,6 +57,12 @@ export function OrderCheckPage() {
       setOrder(prevOrder);
       alert("배송지 정보 변경에 실패했습니다. 다시 시도해 주세요.");
     }
+  }
+
+  function handleCouponApply(discount: number, gift: boolean) {
+    setCouponDiscount(discount);
+    setHasGift(gift);
+    setIsModalOpen(false);
   }
 
   return (
@@ -79,7 +90,7 @@ export function OrderCheckPage() {
       </div>
 
       <div>
-        <button>쿠폰 적용</button>
+        <button onClick={() => setIsModalOpen(true)}>쿠폰 적용</button>
       </div>
 
       <div>
@@ -99,6 +110,12 @@ export function OrderCheckPage() {
           <span>주문 금액</span>
           <span>{orderAmount.toLocaleString()}원</span>
         </div>
+        {hasGift && (
+          <div>
+            <span>증정품</span>
+            <span>2+1 쿠폰 증정품이 포함되어 있습니다</span>
+          </div>
+        )}
         <div>
           <span>쿠폰 할인 금액</span>
           <span>-{couponDiscount.toLocaleString()}원</span>
@@ -114,6 +131,14 @@ export function OrderCheckPage() {
       </div>
 
       <Button label="결제하기" onClick={() => {}} />
+
+      {isModalOpen && (
+        <CouponModal
+          orderId={orderId!}
+          onClose={() => setIsModalOpen(false)}
+          onApply={handleCouponApply}
+        />
+      )}
     </div>
   );
 }
