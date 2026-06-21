@@ -150,7 +150,10 @@ export function OrderCheckPage() {
           orderTotal={orderAmount}
           deliveryFee={order.deliveryFee}
           onClose={() => setIsModalOpen(false)}
-          onApply={() => setIsModalOpen(false)}
+          onApply={() => {
+              setIsModalOpen(false);
+              getOrderApi(orderId!).then(setOrder).catch(() => alert("주문 정보를 불러오는 데 실패했습니다."));
+            }}
         />
       )}
     </div>
