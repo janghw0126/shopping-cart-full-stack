@@ -128,11 +128,15 @@ export function OrderCheckPage() {
         )}
         <div>
           <span>쿠폰 할인 금액</span>
-          <span>-{couponDiscount.toLocaleString()}원</span>
+          <span>
+            -{(fixedDiscount + percentageDiscount).toLocaleString()}원
+          </span>
         </div>
         <div>
           <span>배송비</span>
-          <span>{order.deliveryFee.toLocaleString()}원</span>
+          <span>
+            {(order.deliveryFee - shippingDiscount).toLocaleString()}원
+          </span>
         </div>
         <div>
           <span>총 결제 금액</span>
@@ -151,9 +155,11 @@ export function OrderCheckPage() {
           deliveryFee={order.deliveryFee}
           onClose={() => setIsModalOpen(false)}
           onApply={() => {
-              setIsModalOpen(false);
-              getOrderApi(orderId!).then(setOrder).catch(() => alert("주문 정보를 불러오는 데 실패했습니다."));
-            }}
+            setIsModalOpen(false);
+            getOrderApi(orderId!)
+              .then(setOrder)
+              .catch(() => alert("주문 정보를 불러오는 데 실패했습니다."));
+          }}
         />
       )}
     </div>
