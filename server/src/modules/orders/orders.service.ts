@@ -48,11 +48,16 @@ export const createOrder = async (orderProducts: OrderProduct[]) => {
   );
 
   // 쿠폰 선택
+  const now = new Date();
+  const usableCoupons = coupons.filter((c) =>
+    isCouponUsable(c, domainCartItems, orderTotal, now),
+  );
   const selectedCoupons = selectTopTwoCoupons(
-    coupons,
+    usableCoupons,
     domainCartItems,
     orderTotal,
     BASE_DELIVERY_FEE,
+    now,
   );
 
   // 주문 레코드 생성
