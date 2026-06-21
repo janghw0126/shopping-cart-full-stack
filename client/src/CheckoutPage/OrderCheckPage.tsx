@@ -47,11 +47,24 @@ export function OrderCheckPage() {
   const fixedDiscount = order.coupons
     .filter((coupon) => coupon.discountType === "fixed")
     .reduce((sum, coupon) => sum + coupon.discountValue, 0);
+  const buyXgetYCoupon = order.coupons.find(
+    (c) => c.discountType === "buyXgetY",
+  );
+  const hasBuyXgetY = !!buyXgetYCoupon;
+  const eligibleProducts = order.products.filter((p) => p.quantity >= 2);
+  const giftProduct =
+    hasBuyXgetY && eligibleProducts.length > 0
+      ? eligibleProducts.reduce((max, p) => (p.price > max.price ? p : max))
+      : null;
+  const buyXgetYDiscount = giftProduct ? giftProduct.price : 0;
+  const discountedTotal = Math.max(
+    0,
+    orderAmount - fixedDiscount - buyXgetYDiscount,
+  );
   const percentageDiscount = order.coupons
     .filter((coupon) => coupon.discountType === "percentage")
     .reduce(
-      (sum, coupon) =>
-        sum + (orderAmount - fixedDiscount) * (coupon.discountValue / 100),
+      (sum, coupon) => sum + discountedTotal * (coupon.discountValue / 100),
       0,
     );
   const shippingDiscount = order.coupons.some(
@@ -59,9 +72,12 @@ export function OrderCheckPage() {
   )
     ? order.deliveryFee
     : 0;
-  const couponDiscount = fixedDiscount + percentageDiscount + shippingDiscount;
-  const giftCoupon = order.coupons.find((c) => c.discountType === "buyXgetY");
-  const totalAmount = orderAmount - couponDiscount + order.deliveryFee;
+  const couponDiscount =
+    fixedDiscount + buyXgetYDiscount + percentageDiscount + shippingDiscount;
+  const totalAmount = Math.max(
+    0,
+    orderAmount + order.deliveryFee - couponDiscount,
+  );
 
   async function handlePayment() {
     try {
@@ -69,7 +85,9 @@ export function OrderCheckPage() {
         Number(orderId),
         totalAmount,
       );
-      navigate("/payment/confirm", { state: { finalAmount, typeCount, totalQuantity } });
+      navigate("/payment/confirm", {
+        state: { finalAmount, typeCount, totalQuantity },
+      });
     } catch (e) {
       const code = e instanceof Error ? e.message : "";
       if (code === "PAYMENT_AMOUNT_MISMATCH") {
@@ -105,73 +123,90 @@ export function OrderCheckPage() {
   }
 
   return (
-    <div>
+    <Wrapper>
       <Header onBack={() => navigate("/cart")} />
+      <Content>
+        <TitleSection>
+          <Title>주문 확인</Title>
+          <Subtitle>
+            총 {typeCount}종류의 상품 {totalQuantity}개를 주문합니다.
+            <br />
+            최종 결제 금액을 확인해 주세요.
+          </Subtitle>
+        </TitleSection>
 
-      <div>
-        <h2>주문 확인</h2>
-        <p>
-          총 {typeCount}종류의 상품 {totalQuantity}개를 주문합니다.
-          <br />
-          최종 결제 금액을 확인해 주세요.
-        </p>
-      </div>
+        <ProductList>
+          {order.products.map((product) => (
+            <ProductItem key={product.id}>
+              <ProductImage src={product.image} alt={product.name} />
+              <ProductInfo>
+                <ProductName>{product.name}</ProductName>
+                <ProductPrice>{product.price.toLocaleString()}원</ProductPrice>
+                <ProductQuantity>{product.quantity}개</ProductQuantity>
+              </ProductInfo>
+            </ProductItem>
+          ))}
+        </ProductList>
 
-      <div>
-        {order.products.map((product) => (
-          <div key={product.id}>
-            <img src={product.image} alt={product.name} />
-            <p>{product.name}</p>
-            <p>{product.price.toLocaleString()}원</p>
-            <p>{product.quantity}개</p>
-          </div>
-        ))}
-      </div>
+        <CouponSection>
+          <CouponButton onClick={() => setIsModalOpen(true)}>
+            쿠폰 적용
+          </CouponButton>
+        </CouponSection>
 
-      <div>
-        <button onClick={() => setIsModalOpen(true)}>쿠폰 적용</button>
-      </div>
+        <ShippingSection>
+          <SectionTitle>배송 정보</SectionTitle>
+          <CheckboxRow>
+            <Checkbox
+              checked={order.isRemoteArea}
+              onChange={handleRemoteAreaChange}
+            />
+            <span>제주도 및 도서 산간 지역</span>
+          </CheckboxRow>
+          <InfoText>
+            ⓘ 총 주문 금액이 100,000원 이상일 경우 무료 배송됩니다.
+          </InfoText>
+        </ShippingSection>
 
-      <div>
-        <h3>배송 정보</h3>
-        <div>
-          <Checkbox
-            checked={order.isRemoteArea}
-            onChange={handleRemoteAreaChange}
-          />
-          <span>제주도 및 도서 산간 지역</span>
-        </div>
-        <p>ⓘ 총 주문 금액이 100,000원 이상일 경우 무료 배송됩니다.</p>
-      </div>
-
-      <div>
-        <div>
-          <span>주문 금액</span>
-          <span>{orderAmount.toLocaleString()}원</span>
-        </div>
-        {giftCoupon && (
-          <div>
-            <span>증정품</span>
-            <span>{giftCoupon.title} 증정품이 포함되어 있습니다</span>
-          </div>
-        )}
-        <div>
-          <span>쿠폰 할인 금액</span>
-          <span>
-            -{(fixedDiscount + percentageDiscount).toLocaleString()}원
-          </span>
-        </div>
-        <div>
-          <span>배송비</span>
-          <span>
-            {(order.deliveryFee - shippingDiscount).toLocaleString()}원
-          </span>
-        </div>
-        <div>
-          <span>총 결제 금액</span>
-          <span>{totalAmount.toLocaleString()}원</span>
-        </div>
-      </div>
+        <SummarySection>
+          <Divider />
+          <SummaryRow>
+            <SummaryLabel>주문 금액</SummaryLabel>
+            <SummaryAmount>{orderAmount.toLocaleString()}원</SummaryAmount>
+          </SummaryRow>
+          {giftProduct && (
+            <SummaryRow>
+              <SummaryLabel>증정품</SummaryLabel>
+              <SummaryAmount style={{ fontSize: "14px" }}>
+                {giftProduct.name} 1개 증정 ({buyXgetYCoupon?.title})
+              </SummaryAmount>
+            </SummaryRow>
+          )}
+          <SummaryRow>
+            <SummaryLabel>쿠폰 할인 금액</SummaryLabel>
+            <SummaryAmount>
+              -
+              {(
+                fixedDiscount +
+                buyXgetYDiscount +
+                percentageDiscount
+              ).toLocaleString()}
+              원
+            </SummaryAmount>
+          </SummaryRow>
+          <SummaryRow>
+            <SummaryLabel>배송비</SummaryLabel>
+            <SummaryAmount>
+              {(order.deliveryFee - shippingDiscount).toLocaleString()}원
+            </SummaryAmount>
+          </SummaryRow>
+          <Divider />
+          <SummaryRow>
+            <SummaryLabel>총 결제 금액</SummaryLabel>
+            <SummaryAmount>{totalAmount.toLocaleString()}원</SummaryAmount>
+          </SummaryRow>
+        </SummarySection>
+      </Content>
 
       <Button label="결제하기" onClick={handlePayment} />
 
@@ -191,6 +226,6 @@ export function OrderCheckPage() {
           }}
         />
       )}
-    </div>
+    </Wrapper>
   );
 }
