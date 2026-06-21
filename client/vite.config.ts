@@ -10,6 +10,8 @@ export default defineConfig({
         "https://shopping-cart-full-stack-production-0bda.up.railway.app",
       "/carts":
         "https://shopping-cart-full-stack-production-0bda.up.railway.app",
+      "/orders":
+        "https://shopping-cart-full-stack-production-0bda.up.railway.app",
     },
   },
   test: {
