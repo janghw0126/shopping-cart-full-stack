@@ -50,6 +50,25 @@ export async function getOrderApi(orderId: string): Promise<OrderDetail> {
   return json.data as OrderDetail;
 }
 
+export async function postPaymentApi(
+  orderId: number,
+  amount: number,
+): Promise<{ finalAmount: number }> {
+  const res = await fetch(`${BASE_URL}/payments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ orderId, amount }),
+  });
+
+  const json = await res.json();
+
+  if (json.status !== "success") {
+    throw new Error(json.code);
+  }
+
+  return json.data as { finalAmount: number };
+}
+
 export async function patchOrderCouponApi(
   orderId: string,
   couponIds: number[],
