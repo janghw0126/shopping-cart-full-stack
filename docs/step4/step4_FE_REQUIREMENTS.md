@@ -29,7 +29,7 @@
   - response: `{ status: "success", data: { isRemoteArea, deliveryFee } }`
   - 체크박스 상태는 낙관적 업데이트, 배송비는 서버 응답값으로 업데이트
 - [x] 쿠폰 적용 버튼 클릭 -> 쿠폰 목록 조회 후 쿠폰 선택 모달 오픈
-- [ ] 결제하기 버튼 클릭 -> `POST /payments` 호출 후 결제 금액 확인 페이지로 이동
+- [x] 결제하기 버튼 클릭 -> `POST /payments` 호출 후 결제 금액 확인 페이지로 이동
   - request: `{ orderId: number, amount: number }`
   - response: `{ status: "success", data: { finalAmount: number } }`
   - 에러 `PAYMENT_AMOUNT_MISMATCH`: 알림 표시 후 `/cart`로 리다이렉트
