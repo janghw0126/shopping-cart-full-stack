@@ -69,7 +69,7 @@ export function OrderCheckPage() {
         Number(orderId),
         totalAmount,
       );
-      navigate("/payment/confirm", { state: { finalAmount } });
+      navigate("/payment/confirm", { state: { finalAmount, typeCount, totalQuantity } });
     } catch (e) {
       const code = e instanceof Error ? e.message : "";
       if (code === "PAYMENT_AMOUNT_MISMATCH") {
