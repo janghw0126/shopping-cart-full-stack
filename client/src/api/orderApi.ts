@@ -1,3 +1,5 @@
+import type { OrderDetail } from "../types/order";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 export async function createOrderApi(
@@ -16,4 +18,15 @@ export async function createOrderApi(
   }
 
   return json.data.orderId as number;
+}
+
+export async function getOrderApi(orderId: string): Promise<OrderDetail> {
+  const res = await fetch(`${BASE_URL}/orders/${orderId}`);
+  const json = await res.json();
+
+  if (json.status !== "success") {
+    throw new Error("주문 정보를 불러오는 데 실패했습니다.");
+  }
+
+  return json.data as OrderDetail;
 }
