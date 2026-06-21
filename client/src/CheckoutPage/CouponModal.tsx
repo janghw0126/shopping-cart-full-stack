@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { CouponItem } from "../types/order";
-import { getCouponsApi } from "../api/orderApi";
+import { getCouponsApi, patchOrderCouponApi } from "../api/orderApi";
 import { calculateCouponDiscount } from "../utils/couponUtils";
 import { Checkbox } from "../common/Checkbox";
 import { Button } from "../common/Button";
@@ -13,7 +13,7 @@ interface CouponModalProps {
   orderTotal: number;
   deliveryFee: number;
   onClose: () => void;
-  onApply: (couponIds: number[]) => void;
+  onApply: () => void;
 }
 
 export function CouponModal({
@@ -28,6 +28,7 @@ export function CouponModal({
   const [coupons, setCoupons] = useState<CouponItem[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>(initialSelectedIds);
   const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
     getCouponsApi(orderId)
@@ -47,6 +48,18 @@ export function CouponModal({
       if (prev.length >= 2) return prev;
       return [...prev, couponId];
     });
+  }
+
+  async function handleApply() {
+    setApplying(true);
+    try {
+      await patchOrderCouponApi(orderId, selectedIds);
+      onApply();
+    } catch {
+      alert("쿠폰 적용에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setApplying(false);
+    }
   }
 
   return (
@@ -103,7 +116,8 @@ export function CouponModal({
         )}
         <Button
           label={`총 ${discount.toLocaleString()}원 할인 쿠폰 사용하기`}
-          onClick={() => onApply(selectedIds)}
+          onClick={handleApply}
+          disabled={applying}
         />
       </div>
     </div>
