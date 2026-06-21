@@ -51,7 +51,7 @@ const calculateCombinedDiscount = (
 ): number => {
   // 정액 쿠폰 먼저 적용 (fixed, buyXgetY)
   const fixedDiscount = combination
-    .filter((c) => c.discountType === "fixed" || c.discountType === "buyXgetY")
+    .filter((c) => c.discountType === "fixed")
     .reduce(
       (sum, c) =>
         sum +
@@ -86,7 +86,13 @@ export const calculateFinalAmount = (
   deliveryFee: number,
   now: Date = new Date(),
 ): number => {
-  const totalDiscount = calculateCombinedDiscount(coupons, cartItems, orderTotal, deliveryFee, now);
+  const totalDiscount = calculateCombinedDiscount(
+    coupons,
+    cartItems,
+    orderTotal,
+    deliveryFee,
+    now,
+  );
   return Math.max(0, orderTotal + deliveryFee - totalDiscount);
 };
 
