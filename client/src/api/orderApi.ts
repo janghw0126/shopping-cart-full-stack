@@ -50,6 +50,25 @@ export async function getOrderApi(orderId: string): Promise<OrderDetail> {
   return json.data as OrderDetail;
 }
 
+export async function patchOrderCouponApi(
+  orderId: string,
+  couponIds: number[],
+): Promise<{ couponIds: number[]; hasGift: boolean }> {
+  const res = await fetch(`${BASE_URL}/orders/${orderId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "coupon", couponIds }),
+  });
+
+  const json = await res.json();
+
+  if (json.status !== "success") {
+    throw new Error("쿠폰 적용에 실패했습니다.");
+  }
+
+  return json.data as { couponIds: number[]; hasGift: boolean };
+}
+
 export async function getCouponsApi(orderId: string): Promise<CouponItem[]> {
   const res = await fetch(`${BASE_URL}/orders/${orderId}/coupons`);
   const json = await res.json();
