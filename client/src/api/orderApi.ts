@@ -20,6 +20,25 @@ export async function createOrderApi(
   return json.data.orderId as number;
 }
 
+export async function patchOrderShippingApi(
+  orderId: string,
+  isRemoteArea: boolean,
+): Promise<{ isRemoteArea: boolean; deliveryFee: number }> {
+  const res = await fetch(`${BASE_URL}/orders/${orderId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "shipping", isRemoteArea }),
+  });
+
+  const json = await res.json();
+
+  if (json.status !== "success") {
+    throw new Error("배송지 정보 변경에 실패했습니다.");
+  }
+
+  return json.data as { isRemoteArea: boolean; deliveryFee: number };
+}
+
 export async function getOrderApi(orderId: string): Promise<OrderDetail> {
   const res = await fetch(`${BASE_URL}/orders/${orderId}`);
   const json = await res.json();
