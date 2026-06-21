@@ -33,7 +33,11 @@ export function CartList({
   } = calcOrderSummary(cartItems, isSelected);
 
   function handleOrderCheck() {
-    onOrderCheck({ selectedCount, totalQuantity, totalAmount });
+    const products = cartItems
+      .filter((item) => isSelected[item.product.id])
+      .map((item) => ({ id: item.product.id, quantity: item.quantity }));
+
+    onOrderCheck({ selectedCount, totalQuantity, totalAmount, products });
   }
 
   return (
