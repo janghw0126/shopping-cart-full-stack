@@ -117,6 +117,7 @@ export function OrderCheckPage() {
       {isModalOpen && (
         <CouponModal
           orderId={orderId!}
+          initialSelectedIds={order.coupons.map((coupon) => coupon.id)}
           onClose={() => setIsModalOpen(false)}
           onApply={() => setIsModalOpen(false)}
         />

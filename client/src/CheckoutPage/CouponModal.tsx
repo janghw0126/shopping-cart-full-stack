@@ -7,13 +7,19 @@ import { Spinner } from "../common/Spinner";
 
 interface CouponModalProps {
   orderId: string;
+  initialSelectedIds: number[];
   onClose: () => void;
   onApply: (couponIds: number[]) => void;
 }
 
-export function CouponModal({ orderId, onClose, onApply }: CouponModalProps) {
+export function CouponModal({
+  orderId,
+  initialSelectedIds,
+  onClose,
+  onApply,
+}: CouponModalProps) {
   const [coupons, setCoupons] = useState<CouponItem[]>([]);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>(initialSelectedIds);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
