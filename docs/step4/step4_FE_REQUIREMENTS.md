@@ -22,13 +22,13 @@
 
 ### 이벤트
 
-- [ ] 페이지 진입 시 주문 정보 조회 `GET /orders/:orderId`
+- [x] 페이지 진입 시 주문 정보 조회 `GET /orders/:orderId`
   - response: `{ status: "success", data: { products, coupons, isRemoteArea, deliveryFee } }`
-- [ ] 배송지 체크박스 변경 -> `PATCH /orders/:orderId` 호출
-  - request: `{ type: "remoteArea", isRemoteArea: boolean }`
+- [x] 배송지 체크박스 변경 -> `PATCH /orders/:orderId` 호출
+  - request: `{ type: "shipping", isRemoteArea: boolean }`
   - response: `{ status: "success", data: { isRemoteArea, deliveryFee } }`
-  - 성공 시 배송비 업데이트 (낙관적 업데이트)
-- [ ] 쿠폰 적용 버튼 클릭 -> 쿠폰 목록 조회 후 쿠폰 선택 모달 오픈
+  - 체크박스 상태는 낙관적 업데이트, 배송비는 서버 응답값으로 업데이트
+- [x] 쿠폰 적용 버튼 클릭 -> 쿠폰 목록 조회 후 쿠폰 선택 모달 오픈
 - [ ] 결제하기 버튼 클릭 -> `POST /payments` 호출 후 결제 금액 확인 페이지로 이동
   - request: `{ orderId: number, amount: number }`
   - response: `{ status: "success", data: { finalAmount: number } }`
@@ -49,10 +49,10 @@
 
 ### 이벤트
 
-- [ ] 모달 오픈 시 쿠폰 목록 조회 `GET /orders/:orderId/coupons`
+- [x] 모달 오픈 시 쿠폰 목록 조회 `GET /orders/:orderId/coupons`
   - response: `{ status: "success", data: [{ ...coupon, isCouponUsable: boolean }] }`
-- [ ] 쿠폰 선택/해제 -> 최대 2개 초과 시 추가 선택 불가 처리
-- [ ] 쿠폰 사용하기 버튼 클릭 -> `PATCH /orders/:orderId` 호출
+- [x] 쿠폰 선택/해제 -> 최대 2개 초과 시 추가 선택 불가 처리
+- [x] 쿠폰 사용하기 버튼 클릭 -> `PATCH /orders/:orderId` 호출
   - request: `{ type: "coupon", couponIds: number[] }`
   - response: `{ status: "success", data: { couponIds, hasGift: boolean } }`
   - 성공 시 모달 닫고 주문 확인 페이지 쿠폰 할인 금액 업데이트(할인 금액을 바탕으로 총 결제 금액도 함께 업데이트)
