@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { OrderCheck } from "./CheckoutPage/OrderCheck";
-import { PaymentConfirm } from "./CheckoutPage/PaymentConfirm";
+import { PaymentConfirm } from "./PaymentConfirmPage/PaymentConfirm";
 import { CartPage } from "./CartPage/CartPage";
 
 function App() {
