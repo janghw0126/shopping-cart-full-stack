@@ -1,4 +1,4 @@
-import type { OrderDetail } from "../types/order";
+import type { CouponItem, OrderDetail } from "../types/order";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -48,4 +48,15 @@ export async function getOrderApi(orderId: string): Promise<OrderDetail> {
   }
 
   return json.data as OrderDetail;
+}
+
+export async function getCouponsApi(orderId: string): Promise<CouponItem[]> {
+  const res = await fetch(`${BASE_URL}/orders/${orderId}/coupons`);
+  const json = await res.json();
+
+  if (json.status !== "success") {
+    throw new Error("쿠폰 목록을 불러오는 데 실패했습니다.");
+  }
+
+  return json.data as CouponItem[];
 }
