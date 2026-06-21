@@ -11,6 +11,136 @@ import {
 } from "../api/orderApi";
 import { CouponModal } from "./CouponModal";
 import type { OrderDetail } from "../types/order";
+import styled from "@emotion/styled";
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+`;
+
+const Content = styled.main`
+  flex: 1;
+`;
+
+const TitleSection = styled.div`
+  padding: 24px;
+`;
+
+const Title = styled.h2`
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+`;
+
+const Subtitle = styled.p`
+  font-size: 12px;
+  color: #555;
+  line-height: 1.6;
+`;
+
+const ProductList = styled.ul`
+  padding: 0 24px;
+`;
+
+const ProductItem = styled.li`
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid #eee;
+`;
+
+const ProductImage = styled.img`
+  width: 112px;
+  height: 112px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+`;
+
+const ProductInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const ProductName = styled.p`
+  font-size: 12px;
+  color: #0a0d13;
+`;
+
+const ProductPrice = styled.p`
+  font-size: 24px;
+  font-weight: bold;
+`;
+
+const ProductQuantity = styled.p`
+  font-size: 14px;
+  color: #555;
+`;
+
+const CouponSection = styled.div`
+  padding: 16px 24px;
+`;
+
+const CouponButton = styled.button`
+  width: 100%;
+  height: 48px;
+  border: 1px solid #ddd;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+`;
+
+const ShippingSection = styled.div`
+  padding: 16px 24px;
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+`;
+
+const CheckboxRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+`;
+
+const InfoText = styled.p`
+  font-size: 12px;
+  color: #555;
+  padding: 8px 0;
+`;
+
+const Divider = styled.div`
+  height: 1px;
+  background-color: #eee;
+`;
+
+const SummarySection = styled.div`
+  padding: 0 0 24px;
+`;
+
+const SummaryRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+`;
+
+const SummaryLabel = styled.span`
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+const SummaryAmount = styled.span`
+  font-size: 24px;
+  font-weight: bold;
+`;
 
 export function OrderCheckPage() {
   const { orderId } = useParams();
