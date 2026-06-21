@@ -32,7 +32,12 @@ export function CouponModal({
 
   useEffect(() => {
     getCouponsApi(orderId)
-      .then(setCoupons)
+      .then((data) => {
+        setCoupons(data);
+        setSelectedIds((prev) =>
+          prev.filter((id) => data.find((c) => c.id === id)?.isCouponUsable),
+        );
+      })
       .catch(() => alert("쿠폰 목록을 불러오는 데 실패했습니다."))
       .finally(() => setLoading(false));
   }, [orderId]);
