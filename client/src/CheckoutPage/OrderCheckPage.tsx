@@ -186,11 +186,7 @@ export function OrderCheckPage() {
     hasBuyXgetY && eligibleProducts.length > 0
       ? eligibleProducts.reduce((max, p) => (p.price > max.price ? p : max))
       : null;
-  const buyXgetYDiscount = giftProduct ? giftProduct.price : 0;
-  const discountedTotal = Math.max(
-    0,
-    orderAmount - fixedDiscount - buyXgetYDiscount,
-  );
+  const discountedTotal = Math.max(0, orderAmount - fixedDiscount);
   const percentageDiscount = order.coupons
     .filter((coupon) => coupon.discountType === "percentage")
     .reduce(
@@ -202,8 +198,7 @@ export function OrderCheckPage() {
   )
     ? order.deliveryFee
     : 0;
-  const couponDiscount =
-    fixedDiscount + buyXgetYDiscount + percentageDiscount + shippingDiscount;
+  const couponDiscount = fixedDiscount + percentageDiscount + shippingDiscount;
   const totalAmount = Math.max(
     0,
     orderAmount + order.deliveryFee - couponDiscount,
@@ -315,13 +310,7 @@ export function OrderCheckPage() {
           <SummaryRow>
             <SummaryLabel>쿠폰 할인 금액</SummaryLabel>
             <SummaryAmount>
-              -
-              {(
-                fixedDiscount +
-                buyXgetYDiscount +
-                percentageDiscount
-              ).toLocaleString()}
-              원
+              -{(fixedDiscount + percentageDiscount).toLocaleString()}원
             </SummaryAmount>
           </SummaryRow>
           <SummaryRow>
