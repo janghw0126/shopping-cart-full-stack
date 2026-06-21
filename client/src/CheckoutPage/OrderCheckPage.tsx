@@ -15,8 +15,6 @@ export function OrderCheckPage() {
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [couponDiscount, setCouponDiscount] = useState(0);
-  const [hasGift, setHasGift] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
@@ -41,7 +39,7 @@ export function OrderCheckPage() {
     (sum, product) => sum + product.price * product.quantity,
     0,
   );
-  const totalAmount = orderAmount - couponDiscount + order.deliveryFee;
+  const totalAmount = orderAmount + order.deliveryFee;
 
   async function handleRemoteAreaChange(checked: boolean) {
     const prevOrder = order;
@@ -57,12 +55,6 @@ export function OrderCheckPage() {
       setOrder(prevOrder);
       alert("배송지 정보 변경에 실패했습니다. 다시 시도해 주세요.");
     }
-  }
-
-  function handleCouponApply(discount: number, gift: boolean) {
-    setCouponDiscount(discount);
-    setHasGift(gift);
-    setIsModalOpen(false);
   }
 
   return (
@@ -110,16 +102,6 @@ export function OrderCheckPage() {
           <span>주문 금액</span>
           <span>{orderAmount.toLocaleString()}원</span>
         </div>
-        {hasGift && (
-          <div>
-            <span>증정품</span>
-            <span>2+1 쿠폰 증정품이 포함되어 있습니다</span>
-          </div>
-        )}
-        <div>
-          <span>쿠폰 할인 금액</span>
-          <span>-{couponDiscount.toLocaleString()}원</span>
-        </div>
         <div>
           <span>배송비</span>
           <span>{order.deliveryFee.toLocaleString()}원</span>
@@ -136,7 +118,7 @@ export function OrderCheckPage() {
         <CouponModal
           orderId={orderId!}
           onClose={() => setIsModalOpen(false)}
-          onApply={handleCouponApply}
+          onApply={() => setIsModalOpen(false)}
         />
       )}
     </div>
