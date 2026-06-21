@@ -40,11 +40,7 @@ export function OrderCheckPage() {
 
   async function handleRemoteAreaChange(checked: boolean) {
     const prevOrder = order;
-    setOrder({
-      ...order!,
-      isRemoteArea: checked,
-      deliveryFee: checked ? 6000 : 3000,
-    });
+    setOrder({ ...order!, isRemoteArea: checked });
 
     try {
       const { isRemoteArea, deliveryFee } = await patchOrderShippingApi(
