@@ -5,7 +5,7 @@ import { Button } from "../common/Button";
 import { CartHeader } from "./CartHeader";
 import { CartItems } from "./CartItems";
 import { OrderSummary } from "./OrderSummary";
-import { calcOrderSummary } from "../utils/orderSummaryUtils";
+import { useOrderSummary } from "../hooks/useOrderSummary";
 import { CART_QUANTITY } from "../domain/cart";
 
 interface CartListProps {
@@ -32,7 +32,7 @@ export function CartList({
     orderAmount,
     shippingFee,
     totalAmount,
-  } = calcOrderSummary(cartItems, isSelected);
+  } = useOrderSummary(cartItems, isSelected);
 
   function handleOrderCheck() {
     const products = cartItems
@@ -44,7 +44,13 @@ export function CartList({
 
   return (
     <PageLayout
-      footer={<Button label="주문 확인" onClick={handleOrderCheck} disabled={ordering} />}
+      footer={
+        <Button
+          label="주문 확인"
+          onClick={handleOrderCheck}
+          disabled={ordering}
+        />
+      }
     >
       <CartHeader itemCount={cartItems.length} />
       <CartItems
