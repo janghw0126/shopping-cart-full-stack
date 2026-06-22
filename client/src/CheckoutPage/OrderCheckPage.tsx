@@ -333,7 +333,6 @@ export function OrderCheckPage() {
         <CouponModal
           orderId={orderId!}
           initialSelectedIds={order.coupons.map((coupon) => coupon.id)}
-          initialDiscount={couponDiscount}
           orderTotal={orderAmount}
           deliveryFee={order.deliveryFee}
           onClose={() => setIsModalOpen(false)}

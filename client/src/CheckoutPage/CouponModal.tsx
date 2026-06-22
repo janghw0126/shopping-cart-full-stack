@@ -1,15 +1,12 @@
-import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import type { CouponItem } from "../types/order";
-import { getCouponsApi, patchOrderCouponApi } from "../api/orderApi";
-import { calculateCouponDiscount } from "../utils/couponUtils";
+import { useCoupon } from "../hooks/useCoupon";
 import { Checkbox } from "../common/Checkbox";
 import { Spinner } from "../common/Spinner";
 
 interface CouponModalProps {
   orderId: string;
   initialSelectedIds: number[];
-  initialDiscount: number;
   orderTotal: number;
   deliveryFee: number;
   onClose: () => void;
@@ -125,53 +122,20 @@ const ApplyButton = styled.button`
 export function CouponModal({
   orderId,
   initialSelectedIds,
-  initialDiscount,
   orderTotal,
   deliveryFee,
   onClose,
   onApply,
 }: CouponModalProps) {
-  const [coupons, setCoupons] = useState<CouponItem[]>([]);
-  const [selectedIds, setSelectedIds] = useState<number[]>(initialSelectedIds);
-  const [loading, setLoading] = useState(true);
-  const [applying, setApplying] = useState(false);
-
-  useEffect(() => {
-    getCouponsApi(orderId)
-      .then((data) => {
-        setCoupons(data);
-        setSelectedIds((prev) =>
-          prev.filter((id) => data.find((c) => c.id === id)?.isCouponUsable),
-        );
-      })
-      .catch(() => alert("쿠폰 목록을 불러오는 데 실패했습니다."))
-      .finally(() => setLoading(false));
-  }, [orderId]);
-
-  const selectedCoupons = coupons.filter((c) => selectedIds.includes(c.id));
-  const discount = loading
-    ? initialDiscount
-    : calculateCouponDiscount(selectedCoupons, orderTotal, deliveryFee);
-
-  function handleToggle(couponId: number) {
-    setSelectedIds((prev) => {
-      if (prev.includes(couponId)) return prev.filter((id) => id !== couponId);
-      if (prev.length >= 2) return prev;
-      return [...prev, couponId];
-    });
-  }
-
-  async function handleApply() {
-    setApplying(true);
-    try {
-      await patchOrderCouponApi(orderId, selectedIds);
-      onApply();
-    } catch {
-      alert("쿠폰 적용에 실패했습니다. 다시 시도해 주세요.");
-    } finally {
-      setApplying(false);
-    }
-  }
+  const {
+    coupons,
+    selectedIds,
+    loading,
+    applying,
+    discount,
+    toggleSelect,
+    applySelected,
+  } = useCoupon(orderId, initialSelectedIds, orderTotal, deliveryFee);
 
   return (
     <Overlay onClick={onClose}>
@@ -196,7 +160,7 @@ export function CouponModal({
                   <Checkbox
                     checked={isSelected}
                     onChange={() => {
-                      if (!isDisabled && !isMaxed) handleToggle(coupon.id);
+                      if (!isDisabled && !isMaxed) toggleSelect(coupon.id);
                     }}
                   />
                   <CouponInfo>
@@ -225,7 +189,17 @@ export function CouponModal({
             })}
           </CouponList>
         )}
-        <ApplyButton onClick={handleApply} disabled={applying}>
+        <ApplyButton
+          onClick={async () => {
+            try {
+              await applySelected();
+              onApply();
+            } catch {
+              alert("쿠폰 적용에 실패했습니다. 다시 시도해 주세요.");
+            }
+          }}
+          disabled={applying}
+        >
           총 {discount.toLocaleString()}원 할인 쿠폰 사용하기
         </ApplyButton>
       </ModalCard>
