@@ -70,7 +70,6 @@ export function useCoupon(
   return {
     coupons,
     selectedIds,
-    setSelectedIds,
     loading,
     applying,
     discount,
