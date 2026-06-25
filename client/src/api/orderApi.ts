@@ -1,4 +1,4 @@
-import type { CouponItem, OrderDetail } from "../types/order";
+import type { CouponItem, OrderCoupon, OrderDetail } from "../types/order";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -23,7 +23,7 @@ export async function createOrderApi(
 export async function patchOrderShippingApi(
   orderId: string,
   isRemoteArea: boolean,
-): Promise<{ isRemoteArea: boolean; deliveryFee: number }> {
+): Promise<{ isRemoteArea: boolean; deliveryFee: number; orderAmount: number; couponDiscount: number; shippingDiscount: number; totalAmount: number }> {
   const res = await fetch(`${BASE_URL}/orders/${orderId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -36,7 +36,7 @@ export async function patchOrderShippingApi(
     throw new Error("배송지 정보 변경에 실패했습니다.");
   }
 
-  return json.data as { isRemoteArea: boolean; deliveryFee: number };
+  return json.data as { isRemoteArea: boolean; deliveryFee: number; orderAmount: number; couponDiscount: number; shippingDiscount: number; totalAmount: number };
 }
 
 export async function getOrderApi(orderId: string): Promise<OrderDetail> {
@@ -72,7 +72,7 @@ export async function postPaymentApi(
 export async function patchOrderCouponApi(
   orderId: string,
   couponIds: number[],
-): Promise<{ couponIds: number[]; hasGift: boolean }> {
+): Promise<{ coupons: OrderCoupon[]; orderAmount: number; couponDiscount: number; shippingDiscount: number; totalAmount: number }> {
   const res = await fetch(`${BASE_URL}/orders/${orderId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -85,7 +85,7 @@ export async function patchOrderCouponApi(
     throw new Error("쿠폰 적용에 실패했습니다.");
   }
 
-  return json.data as { couponIds: number[]; hasGift: boolean };
+  return json.data as { coupons: OrderCoupon[]; orderAmount: number; couponDiscount: number; shippingDiscount: number; totalAmount: number };
 }
 
 export async function getCouponsApi(orderId: string): Promise<CouponItem[]> {
