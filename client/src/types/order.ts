@@ -30,4 +30,8 @@ export interface OrderDetail {
   coupons: OrderCoupon[];
   isRemoteArea: boolean;
   deliveryFee: number;
+  orderAmount: number;
+  couponDiscount: number;
+  shippingDiscount: number;
+  totalAmount: number;
 }
