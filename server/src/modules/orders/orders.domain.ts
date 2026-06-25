@@ -96,6 +96,42 @@ export const calculateFinalAmount = (
   return Math.max(0, orderTotal + deliveryFee - totalDiscount);
 };
 
+export const calcOrderBreakdown = (
+  appliedCoupons: Coupon[],
+  cartItems: CartItem[],
+  deliveryFee: number,
+  now: Date = new Date(),
+): { orderAmount: number; couponDiscount: number; shippingDiscount: number; totalAmount: number } => {
+  const orderAmount = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+
+  const fixedDiscount = appliedCoupons
+    .filter((c) => c.discountType === "fixed")
+    .reduce((sum, c) => {
+      const meetsMinimum = !c.minimumAmount || orderAmount >= c.minimumAmount;
+      return sum + (meetsMinimum ? c.discountValue : 0);
+    }, 0);
+
+  const discountedTotal = Math.max(0, orderAmount - fixedDiscount);
+  const percentageDiscount = appliedCoupons
+    .filter((c) => c.discountType === "percentage")
+    .reduce((sum, c) => {
+      if (!isWithinAvailableTime(c, now)) return sum;
+      return sum + discountedTotal * (c.discountValue / 100);
+    }, 0);
+
+  const shippingDiscount = appliedCoupons
+    .filter((c) => c.discountType === "freeShipping")
+    .reduce((sum, c) => {
+      const meetsMinimum = !c.minimumAmount || orderAmount >= c.minimumAmount;
+      return sum + (meetsMinimum ? deliveryFee : 0);
+    }, 0);
+
+  const couponDiscount = fixedDiscount + percentageDiscount;
+  const totalAmount = Math.max(0, orderAmount + deliveryFee - couponDiscount - shippingDiscount);
+
+  return { orderAmount, couponDiscount, shippingDiscount, totalAmount };
+};
+
 export const findBogoGiftProductId = (cartItems: CartItem[]): number | null => {
   const eligible = cartItems.filter((item) => item.quantity >= 2);
   if (eligible.length === 0) return null;
