@@ -24,10 +24,10 @@ export async function patchOrderShippingApi(
   orderId: string,
   isRemoteArea: boolean,
 ): Promise<{ isRemoteArea: boolean; deliveryFee: number; orderAmount: number; couponDiscount: number; shippingDiscount: number; totalAmount: number }> {
-  const res = await fetch(`${BASE_URL}/orders/${orderId}`, {
+  const res = await fetch(`${BASE_URL}/orders/${orderId}/shipping`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ type: "shipping", isRemoteArea }),
+    body: JSON.stringify({ isRemoteArea }),
   });
 
   const json = await res.json();
@@ -73,10 +73,10 @@ export async function patchOrderCouponApi(
   orderId: string,
   couponIds: number[],
 ): Promise<{ coupons: OrderCoupon[]; orderAmount: number; couponDiscount: number; shippingDiscount: number; totalAmount: number }> {
-  const res = await fetch(`${BASE_URL}/orders/${orderId}`, {
+  const res = await fetch(`${BASE_URL}/orders/${orderId}/coupons`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ type: "coupon", couponIds }),
+    body: JSON.stringify({ couponIds }),
   });
 
   const json = await res.json();
