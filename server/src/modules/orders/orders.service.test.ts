@@ -2,7 +2,7 @@ jest.mock("./orders.repository");
 
 import { AppError } from "@/errors/AppError";
 import * as repo from "./orders.repository";
-import { getCoupons, getOrder, patchOrder } from "./orders.service";
+import { getCoupons, getOrder, patchOrderCoupon, patchOrderShipping } from "./orders.service";
 
 const mockGetOrderById = repo.getOrderByIdQuery as jest.MockedFunction<
   typeof repo.getOrderByIdQuery
@@ -122,13 +122,13 @@ const expiredCouponFixture = {
   expirationDate: "2020-01-01",
 };
 
-describe("patchOrder - 쿠폰 변경", () => {
+describe("patchOrderCoupon", () => {
   beforeEach(() => jest.clearAllMocks());
 
   it("존재하지 않는 주문이면 NOT_FOUND_ORDER 에러를 던진다", async () => {
     mockGetOrderById.mockResolvedValue(null);
 
-    await expect(patchOrder(999, { type: "coupon", couponIds: [1] })).rejects.toMatchObject({
+    await expect(patchOrderCoupon(999, { couponIds: [1] })).rejects.toMatchObject({
       code: "NOT_FOUND_ORDER",
     });
   });
@@ -138,43 +138,53 @@ describe("patchOrder - 쿠폰 변경", () => {
     mockGetAllCoupons.mockResolvedValue([expiredCouponFixture]);
     mockGetOrderProducts.mockResolvedValue(mockProducts);
 
-    await expect(patchOrder(1, { type: "coupon", couponIds: [2] })).rejects.toMatchObject({
+    await expect(patchOrderCoupon(1, { couponIds: [2] })).rejects.toMatchObject({
       code: "EXPIRED_COUPON",
     });
   });
 
-  it("쿠폰 변경 성공 시 couponIds를 반환한다", async () => {
+  it("쿠폰 변경 성공 시 적용된 쿠폰 목록과 금액을 반환한다", async () => {
     mockGetOrderById.mockResolvedValue(mockOrder);
     mockGetAllCoupons.mockResolvedValue([couponFixture]);
     mockGetOrderProducts.mockResolvedValue(mockProducts);
     mockUpdateOrderCoupons.mockResolvedValue(undefined);
     mockUpdateOrderProductGifts.mockResolvedValue(undefined);
 
-    const result = await patchOrder(1, { type: "coupon", couponIds: [1] });
+    const result = await patchOrderCoupon(1, { couponIds: [1] });
 
-    expect(result).toEqual({ couponIds: [1], hasGift: false });
+    expect(result).toMatchObject({
+      coupons: [{ id: 1, title: "5000원 할인", discountType: "fixed", discountValue: 5000 }],
+      orderAmount: 9000,
+      couponDiscount: 0,
+      shippingDiscount: 0,
+      totalAmount: 12000,
+    });
   });
 });
 
-describe("patchOrder - 배송지 변경", () => {
+describe("patchOrderShipping", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  it("isRemoteArea 업데이트 후 deliveryFee와 함께 반환한다", async () => {
+  it("isRemoteArea 업데이트 후 deliveryFee와 금액을 반환한다", async () => {
     mockGetOrderById.mockResolvedValue(mockOrder);
     mockUpdateOrderIsRemoteArea.mockResolvedValue(undefined);
+    mockGetOrderCoupons.mockResolvedValue([]);
+    mockGetOrderProducts.mockResolvedValue(mockProducts);
 
-    const result = await patchOrder(1, { type: "shipping", isRemoteArea: true });
+    const result = await patchOrderShipping(1, { isRemoteArea: true });
 
-    expect(result).toEqual({ isRemoteArea: true, deliveryFee: 6000 });
+    expect(result).toMatchObject({ isRemoteArea: true, deliveryFee: 6000, orderAmount: 9000, totalAmount: 15000 });
   });
 
   it("isRemoteArea false이면 기본 배송비를 반환한다", async () => {
     mockGetOrderById.mockResolvedValue(mockOrder);
     mockUpdateOrderIsRemoteArea.mockResolvedValue(undefined);
+    mockGetOrderCoupons.mockResolvedValue([]);
+    mockGetOrderProducts.mockResolvedValue(mockProducts);
 
-    const result = await patchOrder(1, { type: "shipping", isRemoteArea: false });
+    const result = await patchOrderShipping(1, { isRemoteArea: false });
 
-    expect(result).toEqual({ isRemoteArea: false, deliveryFee: 3000 });
+    expect(result).toMatchObject({ isRemoteArea: false, deliveryFee: 3000, orderAmount: 9000, totalAmount: 12000 });
   });
 });
 
@@ -190,18 +200,22 @@ describe("getOrder", () => {
     });
   });
 
-  it("주문 정보(products, coupons, isRemoteArea, deliveryFee)를 반환한다", async () => {
+  it("주문 정보(products, coupons, isRemoteArea, deliveryFee)와 금액을 반환한다", async () => {
     mockGetOrderById.mockResolvedValue(mockOrder);
     mockGetOrderProducts.mockResolvedValue(mockProducts);
     mockGetOrderCoupons.mockResolvedValue(mockCoupons);
 
     const result = await getOrder(1);
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       products: mockProducts,
-      coupons: mockCoupons,
+      coupons: [{ id: 1, title: "5000원 할인", discountType: "fixed", discountValue: 5000 }],
       isRemoteArea: false,
       deliveryFee: 3000,
+      orderAmount: 9000,
+      couponDiscount: 0,
+      shippingDiscount: 0,
+      totalAmount: 12000,
     });
   });
 
