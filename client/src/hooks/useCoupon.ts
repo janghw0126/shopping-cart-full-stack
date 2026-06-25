@@ -60,8 +60,7 @@ export function useCoupon(
   async function applySelected() {
     setApplying(true);
     try {
-      await patchOrderCouponApi(orderId, selectedIds);
-      return true;
+      return await patchOrderCouponApi(orderId, selectedIds);
     } finally {
       setApplying(false);
     }
