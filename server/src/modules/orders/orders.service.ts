@@ -1,6 +1,6 @@
 import { AppError } from "@/errors/AppError";
 import type { CartItem } from "@/type";
-import { findBogoGiftProductId, isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
+import { calcOrderBreakdown, findBogoGiftProductId, isCouponUsable, selectTopTwoCoupons } from "./orders.domain";
 import type { OrderProduct, PatchOrderBody } from "./orders.schema";
 import {
   createOrderCouponsQuery,
@@ -111,12 +111,40 @@ export const patchOrder = async (orderId: number, body: PatchOrderBody) => {
     const giftProductId = hasBogo ? findBogoGiftProductId(domainCartItems) : null;
     await updateOrderProductGiftsQuery(orderId, giftProductId);
 
-    return { couponIds: body.couponIds, hasGift: giftProductId !== null };
+    const { orderAmount, couponDiscount, shippingDiscount, totalAmount } = calcOrderBreakdown(
+      selectedCoupons,
+      domainCartItems,
+      order.deliveryFee,
+      now,
+    );
+    const appliedCoupons = selectedCoupons.map((c) => ({
+      id: c.id,
+      title: c.title,
+      discountType: c.discountType,
+      discountValue: c.discountValue,
+    }));
+
+    return { coupons: appliedCoupons, orderAmount, couponDiscount, shippingDiscount, totalAmount };
   }
 
   const deliveryFee = BASE_DELIVERY_FEE + (body.isRemoteArea ? REMOTE_AREA_FEE : 0);
   await updateOrderIsRemoteAreaQuery(orderId, body.isRemoteArea, deliveryFee);
-  return { isRemoteArea: body.isRemoteArea, deliveryFee };
+
+  const [appliedCoupons, orderProducts] = await Promise.all([
+    getOrderCouponsByOrderIdQuery(orderId),
+    getOrderProductsByOrderIdQuery(orderId),
+  ]);
+  const domainCartItems: CartItem[] = orderProducts.map((p) => ({
+    product: { id: p.id, name: p.name, price: p.price, image: p.image },
+    quantity: p.quantity,
+  }));
+  const { orderAmount, couponDiscount, shippingDiscount, totalAmount } = calcOrderBreakdown(
+    appliedCoupons,
+    domainCartItems,
+    deliveryFee,
+  );
+
+  return { isRemoteArea: body.isRemoteArea, deliveryFee, orderAmount, couponDiscount, shippingDiscount, totalAmount };
 };
 
 export const getCoupons = async (orderId: number) => {
@@ -148,15 +176,35 @@ export const getOrder = async (orderId: number) => {
   const order = await getOrderByIdQuery(orderId);
   if (!order) throw new AppError("NOT_FOUND_ORDER");
 
-  const [products, coupons] = await Promise.all([
+  const [products, appliedCoupons] = await Promise.all([
     getOrderProductsByOrderIdQuery(orderId),
     getOrderCouponsByOrderIdQuery(orderId),
   ]);
+
+  const domainCartItems: CartItem[] = products.map((p) => ({
+    product: { id: p.id, name: p.name, price: p.price, image: p.image },
+    quantity: p.quantity,
+  }));
+  const { orderAmount, couponDiscount, shippingDiscount, totalAmount } = calcOrderBreakdown(
+    appliedCoupons,
+    domainCartItems,
+    order.deliveryFee,
+  );
+  const coupons = appliedCoupons.map((c) => ({
+    id: c.id,
+    title: c.title,
+    discountType: c.discountType,
+    discountValue: c.discountValue,
+  }));
 
   return {
     products,
     coupons,
     isRemoteArea: order.isRemoteArea,
     deliveryFee: order.deliveryFee,
+    orderAmount,
+    couponDiscount,
+    shippingDiscount,
+    totalAmount,
   };
 };
