@@ -149,6 +149,7 @@ export function OrderCheckPage() {
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdatingShipping, setIsUpdatingShipping] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
@@ -208,6 +209,7 @@ export function OrderCheckPage() {
 
   async function handleRemoteAreaChange(checked: boolean) {
     const prevOrder = order;
+    setIsUpdatingShipping(true);
     setOrder({ ...order!, isRemoteArea: checked });
 
     try {
@@ -216,6 +218,8 @@ export function OrderCheckPage() {
     } catch {
       setOrder(prevOrder);
       alert("배송지 정보 변경에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsUpdatingShipping(false);
     }
   }
 
@@ -257,6 +261,7 @@ export function OrderCheckPage() {
             <Checkbox
               checked={order.isRemoteArea}
               onChange={handleRemoteAreaChange}
+              disabled={isUpdatingShipping}
             />
             <span>제주도 및 도서 산간 지역</span>
           </CheckboxRow>
