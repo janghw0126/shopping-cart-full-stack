@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import type { CouponItem } from "../types/order";
+import type { CouponItem, OrderCoupon } from "../types/order";
 import { useCoupon } from "../hooks/useCoupon";
 import { Checkbox } from "../common/Checkbox";
 import { Spinner } from "../common/Spinner";
@@ -10,7 +10,7 @@ interface CouponModalProps {
   orderTotal: number;
   deliveryFee: number;
   onClose: () => void;
-  onApply: () => void;
+  onApply: (result: { coupons: OrderCoupon[]; orderAmount: number; couponDiscount: number; shippingDiscount: number; totalAmount: number }) => void;
 }
 
 const Overlay = styled.div`
@@ -192,8 +192,8 @@ export function CouponModal({
         <ApplyButton
           onClick={async () => {
             try {
-              await applySelected();
-              onApply();
+              const result = await applySelected();
+              onApply(result);
             } catch {
               alert("쿠폰 적용에 실패했습니다. 다시 시도해 주세요.");
             }
