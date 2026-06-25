@@ -169,46 +169,21 @@ export function OrderCheckPage() {
     (sum, product) => sum + product.quantity,
     0,
   );
-  const orderAmount = order.products.reduce(
-    (sum, product) => sum + product.price * product.quantity,
-    0,
-  );
 
-  const fixedDiscount = order.coupons
-    .filter((coupon) => coupon.discountType === "fixed")
-    .reduce((sum, coupon) => sum + coupon.discountValue, 0);
   const buyXgetYCoupon = order.coupons.find(
     (c) => c.discountType === "buyXgetY",
   );
-  const hasBuyXgetY = !!buyXgetYCoupon;
   const eligibleProducts = order.products.filter((p) => p.quantity >= 2);
   const giftProduct =
-    hasBuyXgetY && eligibleProducts.length > 0
+    buyXgetYCoupon && eligibleProducts.length > 0
       ? eligibleProducts.reduce((max, p) => (p.price > max.price ? p : max))
       : null;
-  const discountedTotal = Math.max(0, orderAmount - fixedDiscount);
-  const percentageDiscount = order.coupons
-    .filter((coupon) => coupon.discountType === "percentage")
-    .reduce(
-      (sum, coupon) => sum + discountedTotal * (coupon.discountValue / 100),
-      0,
-    );
-  const shippingDiscount = order.coupons.some(
-    (coupon) => coupon.discountType === "freeShipping",
-  )
-    ? order.deliveryFee
-    : 0;
-  const couponDiscount = fixedDiscount + percentageDiscount + shippingDiscount;
-  const totalAmount = Math.max(
-    0,
-    orderAmount + order.deliveryFee - couponDiscount,
-  );
 
   async function handlePayment() {
     try {
       const { finalAmount } = await postPaymentApi(
         Number(orderId),
-        totalAmount,
+        order!.totalAmount,
       );
       navigate("/payment/confirm", {
         state: { finalAmount, typeCount, totalQuantity },
@@ -236,11 +211,8 @@ export function OrderCheckPage() {
     setOrder({ ...order!, isRemoteArea: checked });
 
     try {
-      const { isRemoteArea, deliveryFee } = await patchOrderShippingApi(
-        orderId!,
-        checked,
-      );
-      setOrder((prev) => ({ ...prev!, isRemoteArea, deliveryFee }));
+      const result = await patchOrderShippingApi(orderId!, checked);
+      setOrder((prev) => ({ ...prev!, ...result }));
     } catch {
       setOrder(prevOrder);
       alert("배송지 정보 변경에 실패했습니다. 다시 시도해 주세요.");
@@ -297,7 +269,7 @@ export function OrderCheckPage() {
           <Divider />
           <SummaryRow>
             <SummaryLabel>주문 금액</SummaryLabel>
-            <SummaryAmount>{orderAmount.toLocaleString()}원</SummaryAmount>
+            <SummaryAmount>{order.orderAmount.toLocaleString()}원</SummaryAmount>
           </SummaryRow>
           {giftProduct && (
             <SummaryRow>
@@ -310,19 +282,19 @@ export function OrderCheckPage() {
           <SummaryRow>
             <SummaryLabel>쿠폰 할인 금액</SummaryLabel>
             <SummaryAmount>
-              -{(fixedDiscount + percentageDiscount).toLocaleString()}원
+              -{order.couponDiscount.toLocaleString()}원
             </SummaryAmount>
           </SummaryRow>
           <SummaryRow>
             <SummaryLabel>배송비</SummaryLabel>
             <SummaryAmount>
-              {(order.deliveryFee - shippingDiscount).toLocaleString()}원
+              {(order.deliveryFee - order.shippingDiscount).toLocaleString()}원
             </SummaryAmount>
           </SummaryRow>
           <Divider />
           <SummaryRow>
             <SummaryLabel>총 결제 금액</SummaryLabel>
-            <SummaryAmount>{totalAmount.toLocaleString()}원</SummaryAmount>
+            <SummaryAmount>{order.totalAmount.toLocaleString()}원</SummaryAmount>
           </SummaryRow>
         </SummarySection>
       </Content>
@@ -333,14 +305,12 @@ export function OrderCheckPage() {
         <CouponModal
           orderId={orderId!}
           initialSelectedIds={order.coupons.map((coupon) => coupon.id)}
-          orderTotal={orderAmount}
+          orderTotal={order.orderAmount}
           deliveryFee={order.deliveryFee}
           onClose={() => setIsModalOpen(false)}
-          onApply={() => {
+          onApply={(result) => {
             setIsModalOpen(false);
-            getOrderApi(orderId!)
-              .then(setOrder)
-              .catch(() => alert("주문 정보를 불러오는 데 실패했습니다."));
+            setOrder((prev) => ({ ...prev!, ...result }));
           }}
         />
       )}
